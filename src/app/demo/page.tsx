@@ -2,18 +2,23 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores/authStore';
+import { useDemoPersona } from '@/stores/authStore';
 import { Loader2, Dog } from 'lucide-react';
 
 export default function DemoPage() {
   const router = useRouter();
-  const { enableDemoMode } = useAuthStore();
+  const existingPersona = useDemoPersona();
 
   useEffect(() => {
-    // Enable demo mode and redirect to dashboard
-    enableDemoMode();
-    router.push('/dashboard');
-  }, [enableDemoMode, router]);
+    // If already has a persona, go to appropriate dashboard
+    if (existingPersona) {
+      const path = existingPersona === 'dog_owner' ? '/parent' : '/dashboard';
+      router.push(path);
+    } else {
+      // First time - show config page to select persona
+      router.push('/demo/config');
+    }
+  }, [existingPersona, router]);
 
   return (
     <div className="min-h-screen bg-surface-950 flex flex-col items-center justify-center">

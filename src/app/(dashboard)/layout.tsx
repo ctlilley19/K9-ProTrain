@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { AppLayout } from '@/components/layout';
 import { PageLoading } from '@/components/ui/Loading';
+import { DemoRoleSwitcher } from '@/components/demo/DemoRoleSwitcher';
 
 export default function DashboardLayout({
   children,
@@ -30,5 +31,10 @@ export default function DashboardLayout({
     return null;
   }
 
-  return <AppLayout>{children}</AppLayout>;
+  return (
+    <>
+      <AppLayout>{children}</AppLayout>
+      <DemoRoleSwitcher />
+    </>
+  );
 }

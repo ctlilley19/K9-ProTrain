@@ -15,7 +15,7 @@ import {
   facilityConfigService,
   configToFeatureFlags,
 } from '@/services/supabase/config';
-import { useFacility, useUser } from '@/stores/authStore';
+import { useFacility, useUser, useDemoPersona, useDemoFamilyId } from '@/stores/authStore';
 import { isDemoMode } from '@/lib/supabase';
 import type {
   ActivityType,
@@ -483,11 +483,19 @@ function getDemoActivities(): Record<ActivityType, Array<{
 
 export function useDogs() {
   const facility = useFacility();
+  const demoPersona = useDemoPersona();
+  const demoFamilyId = useDemoFamilyId();
 
   return useQuery({
-    queryKey: ['dogs', facility?.id],
+    queryKey: ['dogs', facility?.id, demoPersona],
     queryFn: async () => {
       if (isDemoMode() || !facility?.id) {
+        // Filter dogs based on demo persona
+        // Dog owners only see their family's dogs
+        if (demoPersona === 'dog_owner' && demoFamilyId) {
+          return demoDogs.filter(dog => dog.family_id === demoFamilyId);
+        }
+        // Trainers and managers see all dogs
         return demoDogs;
       }
       return dogsService.getAll(facility.id);
@@ -720,11 +728,19 @@ export function useProgram(programId: string | undefined) {
 
 export function useFamilies() {
   const facility = useFacility();
+  const demoPersona = useDemoPersona();
+  const demoFamilyId = useDemoFamilyId();
 
   return useQuery({
-    queryKey: ['families', facility?.id],
+    queryKey: ['families', facility?.id, demoPersona],
     queryFn: async () => {
       if (isDemoMode() || !facility?.id) {
+        // Filter families based on demo persona
+        // Dog owners only see their own family
+        if (demoPersona === 'dog_owner' && demoFamilyId) {
+          return demoFamilies.filter(family => family.id === demoFamilyId);
+        }
+        // Trainers and managers see all families
         return demoFamilies;
       }
       return familiesService.getAll(facility.id);

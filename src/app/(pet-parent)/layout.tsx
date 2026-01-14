@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
+import { useUser, useAuthStore } from '@/stores/authStore';
+import { DemoRoleSwitcher } from '@/components/demo/DemoRoleSwitcher';
 import {
   Dog,
   Home,
@@ -22,19 +24,6 @@ import {
   Activity,
   MessageSquare,
 } from 'lucide-react';
-
-// Mock user data for pet parent
-const mockPetParent = {
-  id: '1',
-  name: 'John Anderson',
-  email: 'anderson@email.com',
-  avatar_url: null,
-  family_name: 'Anderson Family',
-  dogs: [
-    { id: 'a', name: 'Max', photo_url: null },
-    { id: 'b', name: 'Bella', photo_url: null },
-  ],
-};
 
 const navItems = [
   { href: '/parent', label: 'Dashboard', icon: Home },
@@ -57,7 +46,17 @@ export default function PetParentLayout({
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const user = mockPetParent;
+  const authUser = useUser();
+  const { signOut } = useAuthStore();
+
+  // Use auth user data with fallback
+  const user = {
+    id: authUser?.id || '1',
+    name: authUser?.name || 'Pet Parent',
+    email: authUser?.email || 'parent@example.com',
+    avatar_url: authUser?.avatar_url || null,
+    family_name: 'Family',
+  };
 
   return (
     <div className="min-h-screen bg-surface-950">
@@ -188,7 +187,7 @@ export default function PetParentLayout({
                           Settings
                         </Link>
                         <button
-                          onClick={() => {/* Handle logout */}}
+                          onClick={() => signOut()}
                           className="flex items-center gap-2 px-4 py-2 text-sm text-surface-300 hover:bg-surface-700 hover:text-white w-full"
                         >
                           <LogOut size={16} />
@@ -267,6 +266,9 @@ export default function PetParentLayout({
           </div>
         </div>
       </footer>
+
+      {/* Demo Role Switcher */}
+      <DemoRoleSwitcher />
     </div>
   );
 }

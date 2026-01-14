@@ -4,22 +4,10 @@ import type { User, Facility } from '@/types/database';
 import { authService } from '@/services/supabase/auth';
 import { isDemoMode } from '@/lib/supabase';
 
-// Demo user for testing without Supabase
-const demoUser: User = {
-  id: 'demo-user-id',
-  auth_id: 'demo-auth-id',
-  facility_id: 'demo-facility-id',
-  email: 'demo@k9trainpro.com',
-  name: 'Demo Trainer',
-  role: 'admin',
-  avatar_url: null,
-  phone: '(555) 123-4567',
-  is_active: true,
-  last_login_at: new Date().toISOString(),
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-};
+// Demo Persona Types
+export type DemoPersona = 'dog_owner' | 'trainer' | 'manager';
 
+// Demo facility (shared across personas)
 const demoFacility: Facility = {
   id: 'demo-facility-id',
   name: 'Demo Training Facility',
@@ -45,6 +33,62 @@ const demoFacility: Facility = {
   updated_at: new Date().toISOString(),
 };
 
+// Demo user configurations for each persona
+const demoPersonaConfigs: Record<DemoPersona, { user: User; familyId?: string }> = {
+  dog_owner: {
+    user: {
+      id: 'demo-parent-id',
+      auth_id: 'demo-parent-auth-id',
+      facility_id: 'demo-facility-id',
+      email: 'sarah.anderson@demo.com',
+      name: 'Sarah Anderson',
+      role: 'pet_parent',
+      avatar_url: null,
+      phone: '(555) 234-5678',
+      is_active: true,
+      last_login_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    familyId: 'fam-1', // Links to Max and Rocky's family
+  },
+  trainer: {
+    user: {
+      id: 'demo-trainer-id',
+      auth_id: 'demo-trainer-auth-id',
+      facility_id: 'demo-facility-id',
+      email: 'mike.johnson@demofacility.com',
+      name: 'Mike Johnson',
+      role: 'trainer',
+      avatar_url: null,
+      phone: '(555) 345-6789',
+      is_active: true,
+      last_login_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+  },
+  manager: {
+    user: {
+      id: 'demo-user-id',
+      auth_id: 'demo-auth-id',
+      facility_id: 'demo-facility-id',
+      email: 'admin@demofacility.com',
+      name: 'Demo Admin',
+      role: 'admin',
+      avatar_url: null,
+      phone: '(555) 123-4567',
+      is_active: true,
+      last_login_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+  },
+};
+
+// Default demo user (manager)
+const demoUser = demoPersonaConfigs.manager.user;
+
 interface AuthState {
   // State
   user: User | null;
@@ -53,6 +97,10 @@ interface AuthState {
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;
+
+  // Demo Mode State
+  demoPersona: DemoPersona | null;
+  isDemoModeActive: boolean;
 
   // Actions
   setUser: (user: User | null) => void;
@@ -70,6 +118,7 @@ interface AuthState {
 
   // Demo Mode
   enableDemoMode: () => void;
+  setDemoPersona: (persona: DemoPersona) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -82,6 +131,8 @@ export const useAuthStore = create<AuthState>()(
       isLoading: true,
       isInitialized: false,
       error: null,
+      demoPersona: null,
+      isDemoModeActive: false,
 
       // Setters
       setUser: (user) => set({ user, isAuthenticated: !!user }),
@@ -285,6 +336,22 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           isLoading: false,
           isInitialized: true,
+          isDemoModeActive: true,
+          demoPersona: 'manager',
+        });
+      },
+
+      // Set Demo Persona - switch between dog_owner, trainer, manager
+      setDemoPersona: (persona: DemoPersona) => {
+        const config = demoPersonaConfigs[persona];
+        set({
+          user: config.user,
+          facility: demoFacility,
+          demoPersona: persona,
+          isDemoModeActive: true,
+          isAuthenticated: true,
+          isLoading: false,
+          isInitialized: true,
         });
       },
     }),
@@ -294,6 +361,8 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         facility: state.facility,
         isAuthenticated: state.isAuthenticated,
+        demoPersona: state.demoPersona,
+        isDemoModeActive: state.isDemoModeActive,
       }),
     }
   )
@@ -306,3 +375,11 @@ export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenti
 export const useAuthLoading = () => useAuthStore((state) => state.isLoading);
 export const useAuthError = () => useAuthStore((state) => state.error);
 export const useUserRole = () => useAuthStore((state) => state.user?.role);
+
+// Demo Mode Selector Hooks
+export const useDemoPersona = () => useAuthStore((state) => state.demoPersona);
+export const useIsDemoMode = () => useAuthStore((state) => state.isDemoModeActive);
+export const useDemoFamilyId = () => {
+  const persona = useAuthStore((state) => state.demoPersona);
+  return persona ? demoPersonaConfigs[persona]?.familyId : null;
+};
