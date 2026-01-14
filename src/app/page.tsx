@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import {
   Dog,
@@ -13,6 +14,22 @@ import {
   ArrowRight,
   Star,
 } from 'lucide-react';
+
+// K9 Working Dog images from Unsplash (free for commercial use)
+const heroImages = [
+  {
+    url: 'https://images.unsplash.com/photo-1582729909650-cf927813117c?w=1200&q=80',
+    alt: 'Professional K9 German Shepherd with handler',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1546815708-410983510897?w=800&q=80',
+    alt: 'Dog agility training',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=80',
+    alt: 'Golden Retriever in training',
+  },
+];
 
 const features = [
   {
@@ -120,13 +137,18 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Hero Image Placeholder */}
+          {/* Hero Image */}
           <div className="mt-16 relative">
             <div className="absolute inset-0 bg-gradient-to-t from-surface-950 via-transparent to-transparent z-10" />
-            <div className="aspect-video max-w-5xl mx-auto rounded-2xl bg-surface-800/50 border border-surface-700 overflow-hidden">
-              <div className="w-full h-full flex items-center justify-center text-surface-600">
-                <Dog size={64} />
-              </div>
+            <div className="aspect-video max-w-5xl mx-auto rounded-2xl bg-surface-800/50 border border-surface-700 overflow-hidden relative">
+              <Image
+                src={heroImages[0].url}
+                alt={heroImages[0].alt}
+                fill
+                className="object-cover"
+                priority
+                unoptimized
+              />
             </div>
           </div>
         </div>
@@ -194,8 +216,14 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="aspect-square rounded-2xl bg-surface-800/50 border border-surface-700 flex items-center justify-center">
-              <Award size={96} className="text-brand-400 opacity-50" />
+            <div className="aspect-square rounded-2xl bg-surface-800/50 border border-surface-700 overflow-hidden relative">
+              <Image
+                src="https://images.unsplash.com/photo-1546815708-410983510897?w=800&q=80"
+                alt="Dog agility training"
+                fill
+                className="object-cover"
+                unoptimized
+              />
             </div>
           </div>
         </div>

@@ -68,7 +68,7 @@ StatusBadge.displayName = 'StatusBadge';
 
 export interface TierBadgeProps extends HTMLAttributes<HTMLDivElement> {
   tier: BadgeTier;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   showLabel?: boolean;
   animated?: boolean;
 }
@@ -120,9 +120,11 @@ const tierLabels: Record<BadgeTier, string> = {
 };
 
 const tierSizes: Record<string, string> = {
+  xs: 'w-6 h-6 text-[10px]',
   sm: 'w-8 h-8 text-xs',
   md: 'w-12 h-12 text-sm',
   lg: 'w-16 h-16 text-base',
+  xl: 'w-20 h-20 text-lg',
 };
 
 export const TierBadge = forwardRef<HTMLDivElement, TierBadgeProps>(

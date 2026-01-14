@@ -168,8 +168,25 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
 
         try {
+          // In demo mode, create a demo user with the provided info
           if (isDemoMode()) {
-            throw new Error('Cannot sign up in demo mode');
+            const demoUserWithInfo: User = {
+              ...demoUser,
+              name,
+              email,
+            };
+            const demoFacilityWithInfo: Facility = {
+              ...demoFacility,
+              name: facilityName,
+            };
+            set({
+              user: demoUserWithInfo,
+              facility: demoFacilityWithInfo,
+              isAuthenticated: true,
+              isLoading: false,
+              isInitialized: true,
+            });
+            return;
           }
 
           const { user, facility } = await authService.signUp({

@@ -8,7 +8,7 @@ import { familiesService } from '@/services/supabase/families';
 import { badgesService } from '@/services/supabase/badges';
 import { useFacility, useUser } from '@/stores/authStore';
 import { isDemoMode } from '@/lib/supabase';
-import type { ActivityType, Dog, Program, Family, Badge, ActivityWithDetails } from '@/types/database';
+import type { ActivityType, Dog, Program, Family, Badge, ActivityWithDetails, ProgramWithDog, DogWithFamily, User } from '@/types/database';
 
 // ============================================================================
 // DEMO DATA
@@ -575,12 +575,87 @@ export function useUpdateDog() {
 // PROGRAMS HOOKS
 // ============================================================================
 
+// Helper to enrich programs with dog data
+function enrichProgramsWithDogs(programs: Program[]): ProgramWithDog[] {
+  const demoTrainer: User = {
+    id: 'demo-user-id',
+    auth_id: 'demo-auth-id',
+    facility_id: 'demo-facility-id',
+    email: 'trainer@demo.com',
+    name: 'Sarah Johnson',
+    role: 'trainer',
+    avatar_url: null,
+    phone: '(555) 123-4567',
+    is_active: true,
+    last_login_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  const unknownFamily: Family = {
+    id: 'unknown',
+    facility_id: 'demo-facility-id',
+    primary_contact_id: 'unknown',
+    name: 'Unknown Family',
+    address: null,
+    city: null,
+    state: null,
+    zip: null,
+    phone: null,
+    email: null,
+    emergency_contact_name: null,
+    emergency_contact_phone: null,
+    vet_name: null,
+    vet_phone: null,
+    notes: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  const unknownDog: DogWithFamily = {
+    id: 'unknown',
+    family_id: 'unknown',
+    name: 'Unknown Dog',
+    breed: 'Unknown',
+    date_of_birth: '',
+    weight: 0,
+    gender: 'male',
+    color: '',
+    photo_url: null,
+    microchip_id: null,
+    medical_notes: null,
+    behavior_notes: null,
+    feeding_instructions: null,
+    medications: null,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    family: unknownFamily,
+  };
+
+  return programs.map((program) => {
+    const dog = demoDogs.find((d) => d.id === program.dog_id);
+    const family = dog ? demoFamilies.find((f) => f.id === dog.family_id) : null;
+
+    const dogWithFamily: DogWithFamily = dog ? {
+      ...dog,
+      family: family || unknownFamily,
+    } : unknownDog;
+
+    return {
+      ...program,
+      dog: dogWithFamily,
+      trainer: program.assigned_trainer_id ? demoTrainer : null,
+    };
+  });
+}
+
 export function usePrograms(filters?: { status?: 'scheduled' | 'active' | 'completed' | 'cancelled'; dogId?: string }) {
   const facility = useFacility();
 
   return useQuery({
     queryKey: ['programs', facility?.id, filters],
-    queryFn: async () => {
+    queryFn: async (): Promise<ProgramWithDog[]> => {
       if (isDemoMode() || !facility?.id) {
         let filtered = demoPrograms;
         if (filters?.status) {
@@ -589,9 +664,9 @@ export function usePrograms(filters?: { status?: 'scheduled' | 'active' | 'compl
         if (filters?.dogId) {
           filtered = filtered.filter((p) => p.dog_id === filters.dogId);
         }
-        return filtered;
+        return enrichProgramsWithDogs(filtered);
       }
-      return programsService.getAll(facility.id, filters);
+      return programsService.getAll(facility.id, filters) as Promise<ProgramWithDog[]>;
     },
     enabled: !!facility?.id || isDemoMode(),
   });

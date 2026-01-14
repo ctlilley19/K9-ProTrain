@@ -153,19 +153,19 @@ export default function PetParentDashboard() {
           title="Total Badges"
           value={data.dogs.reduce((sum, d) => sum + d.stats.badges_earned, 0)}
           icon={<Award size={20} />}
-          trend={{ value: 2, label: 'this week' }}
+          trend={{ value: 2, isPositive: true, label: 'this week' }}
         />
         <StatCard
           title="Skills Learned"
           value={data.dogs.reduce((sum, d) => sum + d.stats.skills_learned, 0)}
           icon={<TrendingUp size={20} />}
-          trend={{ value: 3, label: 'this week' }}
+          trend={{ value: 3, isPositive: true, label: 'this week' }}
         />
         <StatCard
           title="Photos"
           value={data.recent_photos.length}
           icon={<Image size={20} />}
-          trend={{ value: 4, label: 'new today' }}
+          trend={{ value: 4, isPositive: true, label: 'new today' }}
         />
         <StatCard
           title="Reports"

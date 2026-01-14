@@ -150,6 +150,7 @@ export interface StatCardProps extends HTMLAttributes<HTMLDivElement> {
   trend?: {
     value: number;
     isPositive: boolean;
+    label?: string;
   };
 }
 
