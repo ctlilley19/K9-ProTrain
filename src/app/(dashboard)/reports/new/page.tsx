@@ -1,19 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/layout';
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input, Textarea, Select } from '@/components/ui/Input';
 import { Avatar } from '@/components/ui/Avatar';
-import { cn, formatDate, formatDuration } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
+import {
+  generateReport,
+  reportTemplates,
+  applyTemplate,
+} from '@/services/reportGenerator';
 import {
   Save,
   Send,
   ArrowLeft,
   Dog,
-  Clock,
   Star,
   TrendingUp,
   Heart,
@@ -22,11 +26,12 @@ import {
   Home,
   Target,
   Droplets,
-  Camera,
   Plus,
   X,
   CheckCircle,
-  AlertCircle,
+  Sparkles,
+  Zap,
+  FileText,
 } from 'lucide-react';
 
 // Mock dogs with today's activities
@@ -37,17 +42,25 @@ const mockDogsWithActivities = [
     breed: 'German Shepherd',
     family: 'Anderson Family',
     photo_url: null,
+    programName: '4-Week Board & Train',
+    programDay: 18,
+    totalProgramDays: 28,
     activities: [
-      { type: 'kennel', time: '7:00 AM', duration: 60 },
-      { type: 'potty', time: '8:00 AM', duration: 10, notes: 'Normal' },
-      { type: 'feeding', time: '8:15 AM', duration: 15, notes: 'Ate all food' },
-      { type: 'training', time: '9:00 AM', duration: 45, notes: 'Heel and recall practice' },
-      { type: 'rest', time: '10:00 AM', duration: 60 },
-      { type: 'play', time: '11:00 AM', duration: 30, notes: 'Yard play' },
-      { type: 'feeding', time: '12:00 PM', duration: 15 },
+      { id: '1', type: 'kennel' as const, start_time: '07:00', duration: 60 },
+      { id: '2', type: 'potty' as const, start_time: '08:00', duration: 10, notes: 'Normal' },
+      { id: '3', type: 'feeding' as const, start_time: '08:15', duration: 15, notes: 'Ate all food' },
+      { id: '4', type: 'training' as const, start_time: '09:00', duration: 45, notes: 'Great focus on heel work. Breakthrough with recall under distraction!', skills_worked: ['Heel', 'Recall', 'Stay'] },
+      { id: '5', type: 'rest' as const, start_time: '10:00', duration: 60 },
+      { id: '6', type: 'play' as const, start_time: '11:00', duration: 30, notes: 'Yard play - good energy' },
+      { id: '7', type: 'training' as const, start_time: '14:00', duration: 30, notes: 'Place command practice', skills_worked: ['Place', 'Stay'] },
+      { id: '8', type: 'feeding' as const, start_time: '17:00', duration: 15, notes: 'Finished all food' },
     ],
-    training_minutes: 45,
-    skills_practiced: ['Heel', 'Recall', 'Stay'],
+    skillAssessments: [
+      { skill_id: 'heel', skill_name: 'Heel', level: 4, previous_level: 3 },
+      { skill_id: 'recall', skill_name: 'Recall', level: 4, previous_level: 3 },
+      { skill_id: 'stay', skill_name: 'Stay', level: 5, previous_level: 4 },
+      { skill_id: 'place', skill_name: 'Place', level: 4 },
+    ],
   },
   {
     id: 'b',
@@ -55,15 +68,20 @@ const mockDogsWithActivities = [
     breed: 'Golden Retriever',
     family: 'Anderson Family',
     photo_url: null,
+    programName: 'Basic Obedience',
+    programDay: 5,
+    totalProgramDays: 8,
     activities: [
-      { type: 'kennel', time: '7:00 AM', duration: 60 },
-      { type: 'potty', time: '8:00 AM', duration: 10 },
-      { type: 'feeding', time: '8:15 AM', duration: 15 },
-      { type: 'training', time: '10:00 AM', duration: 30 },
-      { type: 'play', time: '11:30 AM', duration: 45 },
+      { id: '1', type: 'kennel' as const, start_time: '07:00', duration: 60 },
+      { id: '2', type: 'potty' as const, start_time: '08:00', duration: 10 },
+      { id: '3', type: 'feeding' as const, start_time: '08:15', duration: 15, notes: 'Ate most food' },
+      { id: '4', type: 'training' as const, start_time: '10:00', duration: 30, notes: 'Working on sit-stay duration', skills_worked: ['Sit', 'Stay'] },
+      { id: '5', type: 'play' as const, start_time: '11:30', duration: 45 },
     ],
-    training_minutes: 30,
-    skills_practiced: ['Sit', 'Stay'],
+    skillAssessments: [
+      { skill_id: 'sit', skill_name: 'Sit', level: 4 },
+      { skill_id: 'stay', skill_name: 'Stay', level: 3, previous_level: 2 },
+    ],
   },
 ];
 
@@ -97,6 +115,14 @@ const activityIcons: Record<string, React.ReactNode> = {
   rest: <Moon size={14} />,
 };
 
+const templateOptions = [
+  { key: 'excellent_day', label: 'Excellent Day', icon: '⭐' },
+  { key: 'good_day', label: 'Good Day', icon: '👍' },
+  { key: 'challenging_day', label: 'Challenging Day', icon: '💪' },
+  { key: 'first_day', label: 'First Day', icon: '🎉' },
+  { key: 'graduation_ready', label: 'Graduation Ready', icon: '🎓' },
+];
+
 export default function NewReportPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -105,6 +131,8 @@ export default function NewReportPage() {
   const [selectedDog, setSelectedDog] = useState(preselectedDog || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -120,6 +148,60 @@ export default function NewReportPage() {
   });
 
   const dog = mockDogsWithActivities.find((d) => d.id === selectedDog);
+
+  // Auto-generate report from activities
+  const handleAutoGenerate = async () => {
+    if (!dog) return;
+
+    setIsGenerating(true);
+    try {
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      const generated = generateReport(
+        dog.activities,
+        dog.skillAssessments,
+        {
+          name: dog.name,
+          breed: dog.breed,
+          programName: dog.programName,
+          programDay: dog.programDay,
+          totalProgramDays: dog.totalProgramDays,
+        }
+      );
+
+      setFormData({
+        summary: generated.summary,
+        mood: generated.mood,
+        energy_level: generated.energy_level,
+        appetite: generated.appetite,
+        potty: generated.potty,
+        highlights: generated.highlights.length > 0 ? generated.highlights : [''],
+        areas_to_improve: generated.areas_to_improve.length > 0 ? generated.areas_to_improve : [''],
+        tomorrow_focus: generated.tomorrow_focus,
+        private_notes: '',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Apply a template
+  const handleApplyTemplate = (templateKey: keyof typeof reportTemplates) => {
+    if (!dog) return;
+
+    const template = applyTemplate(templateKey, dog.name);
+
+    setFormData((prev) => ({
+      ...prev,
+      summary: template.summary || prev.summary,
+      highlights: template.highlights || prev.highlights,
+      areas_to_improve: template.areas_to_improve || prev.areas_to_improve,
+      tomorrow_focus: template.tomorrow_focus || prev.tomorrow_focus,
+    }));
+
+    setShowTemplates(false);
+  };
 
   const addHighlight = () => {
     setFormData((prev) => ({
@@ -185,6 +267,16 @@ export default function NewReportPage() {
     }
   };
 
+  // Calculate training stats
+  const trainingMinutes = dog?.activities
+    .filter((a) => a.type === 'training')
+    .reduce((sum, a) => sum + a.duration, 0) || 0;
+
+  const skillsPracticed = new Set<string>();
+  dog?.activities.forEach((a) => {
+    a.skills_worked?.forEach((s) => skillsPracticed.add(s));
+  });
+
   return (
     <div>
       <PageHeader
@@ -236,9 +328,9 @@ export default function NewReportPage() {
               <CardHeader title="Today's Activities" />
               <CardContent>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {dog.activities.map((activity, idx) => (
+                  {dog.activities.map((activity) => (
                     <div
-                      key={idx}
+                      key={activity.id}
                       className="flex items-center gap-3 p-2 rounded-lg bg-surface-800/50"
                     >
                       <div className="w-7 h-7 rounded-lg bg-surface-700 flex items-center justify-center text-surface-400">
@@ -249,11 +341,13 @@ export default function NewReportPage() {
                           {activity.type}
                         </p>
                         {activity.notes && (
-                          <p className="text-xs text-surface-500">{activity.notes}</p>
+                          <p className="text-xs text-surface-500 line-clamp-1">
+                            {activity.notes}
+                          </p>
                         )}
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-surface-400">{activity.time}</p>
+                        <p className="text-xs text-surface-400">{activity.start_time}</p>
                         <p className="text-xs text-surface-500">{activity.duration}m</p>
                       </div>
                     </div>
@@ -264,12 +358,10 @@ export default function NewReportPage() {
                 <div className="mt-4 pt-4 border-t border-surface-700">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-surface-400">Training Time</span>
-                    <span className="text-white font-medium">
-                      {dog.training_minutes} minutes
-                    </span>
+                    <span className="text-white font-medium">{trainingMinutes} minutes</span>
                   </div>
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {dog.skills_practiced.map((skill) => (
+                    {Array.from(skillsPracticed).map((skill) => (
                       <span
                         key={skill}
                         className="px-2 py-1 rounded bg-brand-500/10 text-brand-400 text-xs"
@@ -279,7 +371,62 @@ export default function NewReportPage() {
                     ))}
                   </div>
                 </div>
+
+                {/* Program Progress */}
+                <div className="mt-4 pt-4 border-t border-surface-700">
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-surface-400">{dog.programName}</span>
+                    <span className="text-white">
+                      Day {dog.programDay}/{dog.totalProgramDays}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-surface-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-brand-500 transition-all"
+                      style={{
+                        width: `${(dog.programDay / dog.totalProgramDays) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
               </CardContent>
+            </Card>
+          )}
+
+          {/* Quick Templates */}
+          {dog && (
+            <Card>
+              <CardHeader
+                title="Quick Templates"
+                action={
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowTemplates(!showTemplates)}
+                  >
+                    {showTemplates ? 'Hide' : 'Show'}
+                  </Button>
+                }
+              />
+              {showTemplates && (
+                <CardContent>
+                  <div className="space-y-2">
+                    {templateOptions.map((template) => (
+                      <button
+                        key={template.key}
+                        type="button"
+                        onClick={() =>
+                          handleApplyTemplate(template.key as keyof typeof reportTemplates)
+                        }
+                        className="w-full flex items-center gap-3 p-3 rounded-xl bg-surface-800/50 hover:bg-surface-800 border border-surface-700 hover:border-surface-600 transition-all text-left"
+                      >
+                        <span className="text-xl">{template.icon}</span>
+                        <span className="text-white">{template.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              )}
             </Card>
           )}
         </div>
@@ -296,6 +443,33 @@ export default function NewReportPage() {
             </Card>
           ) : (
             <>
+              {/* Auto Generate Banner */}
+              <Card className="border-brand-500/30 bg-gradient-to-r from-brand-500/10 to-purple-500/10">
+                <CardContent className="py-4">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-brand-500/20 flex items-center justify-center">
+                        <Sparkles size={20} className="text-brand-400" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-white">Auto-Generate Report</h3>
+                        <p className="text-sm text-surface-400">
+                          Create a report from today's {dog?.activities.length} activities
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="primary"
+                      onClick={handleAutoGenerate}
+                      isLoading={isGenerating}
+                      leftIcon={<Zap size={16} />}
+                    >
+                      Generate Report
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Summary */}
               <Card>
                 <CardHeader title="Report Summary" />
