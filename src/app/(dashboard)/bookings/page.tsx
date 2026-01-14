@@ -352,6 +352,7 @@ export default function BookingsPage() {
         isOpen={showDetailModal}
         onClose={() => setShowDetailModal(false)}
         size="lg"
+        raw
       >
         {selectedBooking && (
           <>

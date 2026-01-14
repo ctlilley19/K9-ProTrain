@@ -14,6 +14,7 @@ export interface ModalProps extends HTMLAttributes<HTMLDivElement> {
   showCloseButton?: boolean;
   closeOnOverlayClick?: boolean;
   footer?: ReactNode;
+  raw?: boolean; // When true, renders children directly without built-in header/body/footer
 }
 
 const sizeStyles: Record<string, string> = {
@@ -36,6 +37,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       showCloseButton = true,
       closeOnOverlayClick = true,
       footer,
+      raw = false,
       children,
       ...props
     },
@@ -91,46 +93,52 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
           )}
           {...props}
         >
-          {/* Header */}
-          {(title || showCloseButton) && (
-            <div className="flex items-start justify-between gap-4 p-4 border-b border-surface-700">
-              <div>
-                {title && (
-                  <h2
-                    id="modal-title"
-                    className="text-lg font-semibold text-white"
-                  >
-                    {title}
-                  </h2>
-                )}
-                {description && (
-                  <p className="mt-1 text-sm text-surface-400">{description}</p>
-                )}
-              </div>
-              {showCloseButton && (
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={onClose}
-                  className="flex-shrink-0 -mr-1 -mt-1"
-                  aria-label="Close modal"
-                >
-                  <X size={18} />
-                </Button>
+          {raw ? (
+            children
+          ) : (
+            <>
+              {/* Header */}
+              {(title || showCloseButton) && (
+                <div className="flex items-start justify-between gap-4 p-4 border-b border-surface-700">
+                  <div>
+                    {title && (
+                      <h2
+                        id="modal-title"
+                        className="text-lg font-semibold text-white"
+                      >
+                        {title}
+                      </h2>
+                    )}
+                    {description && (
+                      <p className="mt-1 text-sm text-surface-400">{description}</p>
+                    )}
+                  </div>
+                  {showCloseButton && (
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={onClose}
+                      className="flex-shrink-0 -mr-1 -mt-1"
+                      aria-label="Close modal"
+                    >
+                      <X size={18} />
+                    </Button>
+                  )}
+                </div>
               )}
-            </div>
-          )}
 
-          {/* Body */}
-          <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-            {children}
-          </div>
+              {/* Body */}
+              <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+                {children}
+              </div>
 
-          {/* Footer */}
-          {footer && (
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-surface-700">
-              {footer}
-            </div>
+              {/* Footer */}
+              {footer && (
+                <div className="flex items-center justify-end gap-3 p-4 border-t border-surface-700">
+                  {footer}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -139,6 +147,31 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
 );
 
 Modal.displayName = 'Modal';
+
+// Modal subcomponents for custom layouts
+export function ModalHeader({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={cn('p-4 border-b border-surface-700', className)}>
+      {children}
+    </div>
+  );
+}
+
+export function ModalBody({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={cn('p-4 max-h-[calc(100vh-200px)] overflow-y-auto', className)}>
+      {children}
+    </div>
+  );
+}
+
+export function ModalFooter({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={cn('flex items-center justify-end gap-3 p-4 border-t border-surface-700', className)}>
+      {children}
+    </div>
+  );
+}
 
 // Confirm Dialog
 export interface ConfirmDialogProps {
