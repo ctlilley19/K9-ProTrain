@@ -1,7 +1,8 @@
 // Live Status Feed Service
 // Provides real-time status updates for pet parents
 
-import { supabase, isDemo, getDemoFacilityId } from './client';
+import { supabase } from '@/lib/supabase';
+import { isDemoMode, DEMO_FACILITY_ID } from '@/lib/demo-config';
 import type {
   StatusFeedItem,
   StatusFeedItemWithDetails,
@@ -12,6 +13,10 @@ import type {
   StatusUpdateType,
   DogMood,
 } from '@/types/database';
+
+// Helper functions for demo mode compatibility
+const isDemo = isDemoMode;
+const getDemoFacilityId = () => DEMO_FACILITY_ID;
 
 // ============================================================================
 // Demo Data

@@ -1,4 +1,5 @@
-import { supabase, isDemoMode } from './client';
+import { supabase } from '@/lib/supabase';
+import { isDemoMode } from '@/lib/demo-config';
 import type {
   Conversation,
   Message,

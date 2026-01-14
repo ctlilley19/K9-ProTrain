@@ -1,13 +1,18 @@
 // Business Mode Configuration Service
 // Manages facility configuration and feature flags
 
-import { supabase, isDemo, getDemoFacilityId } from './client';
+import { supabase } from '@/lib/supabase';
+import { isDemoMode, DEMO_FACILITY_ID } from '@/lib/demo-config';
 import type {
   FacilityConfig,
   FeaturePreset,
   FeatureFlags,
   BusinessMode,
 } from '@/types/database';
+
+// Helper functions for demo mode compatibility
+const isDemo = isDemoMode;
+const getDemoFacilityId = () => DEMO_FACILITY_ID;
 
 // ============================================================================
 // Demo Data
