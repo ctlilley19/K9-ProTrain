@@ -51,6 +51,7 @@ interface PageHeaderProps {
   description?: string;
   action?: React.ReactNode;
   breadcrumbs?: Array<{ label: string; href?: string }>;
+  icon?: React.ReactNode;
 }
 
 export function PageHeader({
@@ -58,6 +59,7 @@ export function PageHeader({
   description,
   action,
   breadcrumbs,
+  icon,
 }: PageHeaderProps) {
   return (
     <div className="mb-6">
@@ -85,7 +87,10 @@ export function PageHeader({
       {/* Title & Action */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">{title}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+            {icon}
+            {title}
+          </h1>
           {description && (
             <p className="mt-1 text-surface-400">{description}</p>
           )}
