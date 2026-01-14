@@ -119,7 +119,7 @@ export function BadgeCard({
     <div
       onClick={onClick}
       className={cn(
-        'relative flex flex-col items-center rounded-2xl',
+        'group relative flex flex-col items-center rounded-2xl',
         'bg-gradient-to-br from-surface-800/90 to-surface-900/95',
         'border transition-all duration-300',
         'hover:translate-y-[-4px] hover:border-white/10',
@@ -140,6 +140,16 @@ export function BadgeCard({
         borderColor: selected ? style.stroke : undefined,
       }}
     >
+      {/* Card-level shimmer effect on hover */}
+      {!locked && (
+        <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+          <div className={cn(
+            "absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent",
+            "-translate-x-full transition-transform duration-1000 ease-out group-hover:translate-x-full"
+          )} />
+        </div>
+      )}
+
       {/* Selection checkmark */}
       {selected && (
         <div
@@ -174,11 +184,13 @@ export function BadgeCard({
         )}
         style={selected ? { '--badge-glow': style.stroke + '80', '--badge-glow-outer': style.stroke + '40' } as React.CSSProperties : {}}
       >
-        {/* Shimmer effect */}
+        {/* Shimmer effect - always enabled on hover */}
         <div className="absolute inset-0 rounded-full overflow-hidden">
           <div className={cn(
-            "absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700",
-            selected ? "animate-shimmer-continuous" : "-translate-x-full group-hover:translate-x-full"
+            "absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent",
+            selected
+              ? "animate-shimmer-continuous"
+              : "-translate-x-full transition-transform duration-700 ease-out group-hover:translate-x-full"
           )} />
         </div>
 

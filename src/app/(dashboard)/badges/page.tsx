@@ -64,6 +64,18 @@ import {
   HeartHandshake,
   Phone,
   Video,
+  Bike,
+  Tent,
+  Sunrise,
+  Map,
+  Backpack,
+  Wind,
+  Droplets,
+  Fish,
+  Anchor,
+  Rocket,
+  Activity,
+  CircleDashed,
 } from 'lucide-react';
 
 // Tier colors for styling
@@ -130,6 +142,18 @@ const badgeIcons: Record<string, (color: string, size?: number) => React.ReactNo
   helping: (color, size = 32) => <HeartHandshake size={size} stroke={color} />,
   phone: (color, size = 32) => <Phone size={size} stroke={color} />,
   video: (color, size = 32) => <Video size={size} stroke={color} />,
+  bike: (color, size = 32) => <Bike size={size} stroke={color} />,
+  tent: (color, size = 32) => <Tent size={size} stroke={color} />,
+  sunrise: (color, size = 32) => <Sunrise size={size} stroke={color} />,
+  map: (color, size = 32) => <Map size={size} stroke={color} />,
+  backpack: (color, size = 32) => <Backpack size={size} stroke={color} />,
+  wind: (color, size = 32) => <Wind size={size} stroke={color} />,
+  droplets: (color, size = 32) => <Droplets size={size} stroke={color} />,
+  fish: (color, size = 32) => <Fish size={size} stroke={color} />,
+  anchor: (color, size = 32) => <Anchor size={size} stroke={color} />,
+  rocket: (color, size = 32) => <Rocket size={size} stroke={color} />,
+  activity: (color, size = 32) => <Activity size={size} stroke={color} />,
+  circledashed: (color, size = 32) => <CircleDashed size={size} stroke={color} />,
 };
 
 // Badge definitions with full tier support
@@ -360,7 +384,7 @@ const badgeLibrary = [
     description: 'Impulse control around distractions',
     category: 'obedience',
     icon: 'shield',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'drop-it-star',
@@ -368,7 +392,7 @@ const badgeLibrary = [
     description: 'Reliable release of items on command',
     category: 'obedience',
     icon: 'star',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === LEASH & WALKING ===
@@ -378,7 +402,7 @@ const badgeLibrary = [
     description: 'Walk calmly on leash without pulling',
     category: 'leash',
     icon: 'route',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'heel-master',
@@ -394,7 +418,7 @@ const badgeLibrary = [
     description: 'Walk without tension on leash',
     category: 'leash',
     icon: 'route',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === SOCIAL SKILLS ===
@@ -404,7 +428,7 @@ const badgeLibrary = [
     description: 'Positive interactions with dogs and people',
     category: 'social',
     icon: 'heart',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'dog-friendly',
@@ -412,7 +436,7 @@ const badgeLibrary = [
     description: 'Calm and appropriate with other dogs',
     category: 'social',
     icon: 'dog',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'stranger-friendly',
@@ -420,7 +444,7 @@ const badgeLibrary = [
     description: 'Calm greetings with new people',
     category: 'social',
     icon: 'users',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'polite-greeter',
@@ -428,7 +452,7 @@ const badgeLibrary = [
     description: 'No jumping when meeting people',
     category: 'social',
     icon: 'handshake',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === BEHAVIOR & MANNERS ===
@@ -446,7 +470,7 @@ const badgeLibrary = [
     description: 'Relaxed and calm in kennel/crate',
     category: 'behavior',
     icon: 'home',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'potty-pro',
@@ -454,7 +478,7 @@ const badgeLibrary = [
     description: 'House training mastery',
     category: 'behavior',
     icon: 'check',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'calm-traveler',
@@ -462,7 +486,7 @@ const badgeLibrary = [
     description: 'Relaxed behavior during car rides',
     category: 'behavior',
     icon: 'compass',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'impulse-control',
@@ -470,7 +494,7 @@ const badgeLibrary = [
     description: 'Wait patiently for food and doors',
     category: 'behavior',
     icon: 'timer',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === AKC-INSPIRED CERTIFICATIONS ===
@@ -480,7 +504,7 @@ const badgeLibrary = [
     description: 'Canine Good Citizen test preparation',
     category: 'certification',
     icon: 'badge',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'community-canine',
@@ -488,7 +512,7 @@ const badgeLibrary = [
     description: 'Advanced CGC in real-world settings',
     category: 'certification',
     icon: 'building',
-    tiers: ['silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'urban-canine',
@@ -496,7 +520,7 @@ const badgeLibrary = [
     description: 'City environment proficiency',
     category: 'certification',
     icon: 'building',
-    tiers: ['silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'therapy-ready',
@@ -504,7 +528,7 @@ const badgeLibrary = [
     description: 'Temperament for therapy work',
     category: 'certification',
     icon: 'heart',
-    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === TRICK DOG ===
@@ -514,7 +538,7 @@ const badgeLibrary = [
     description: 'Learned 10 basic tricks',
     category: 'tricks',
     icon: 'sparkles',
-    tiers: ['bronze'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'trick-intermediate',
@@ -522,7 +546,7 @@ const badgeLibrary = [
     description: 'Mastered intermediate tricks',
     category: 'tricks',
     icon: 'sparkles',
-    tiers: ['silver'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'trick-advanced',
@@ -530,7 +554,7 @@ const badgeLibrary = [
     description: 'Expert level trick performance',
     category: 'tricks',
     icon: 'sparkles',
-    tiers: ['gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'trick-performer',
@@ -538,7 +562,7 @@ const badgeLibrary = [
     description: 'Can perform trick routines',
     category: 'tricks',
     icon: 'star',
-    tiers: ['platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'trick-elite',
@@ -546,7 +570,7 @@ const badgeLibrary = [
     description: 'Scripted performance mastery',
     category: 'tricks',
     icon: 'crown',
-    tiers: ['diamond'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === OBEDIENCE COMPETITION ===
@@ -556,7 +580,7 @@ const badgeLibrary = [
     description: 'Novice obedience competition ready',
     category: 'competition',
     icon: 'medal',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'companion-excellent',
@@ -564,7 +588,7 @@ const badgeLibrary = [
     description: 'Open class obedience skills',
     category: 'competition',
     icon: 'medal',
-    tiers: ['silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'utility-dog',
@@ -572,7 +596,7 @@ const badgeLibrary = [
     description: 'Advanced utility obedience',
     category: 'competition',
     icon: 'trophy',
-    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === MILESTONES ===
@@ -582,7 +606,7 @@ const badgeLibrary = [
     description: 'Complete the first week of training',
     category: 'milestone',
     icon: 'trophy',
-    tiers: ['bronze'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
   },
   {
     id: 'first-month',
@@ -590,7 +614,7 @@ const badgeLibrary = [
     description: 'One month training milestone',
     category: 'milestone',
     icon: 'calendar',
-    tiers: ['silver'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
   },
   {
     id: 'three-months',
@@ -598,7 +622,7 @@ const badgeLibrary = [
     description: 'Three months of progress',
     category: 'milestone',
     icon: 'milestone',
-    tiers: ['gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
   },
   {
     id: 'graduate',
@@ -606,7 +630,7 @@ const badgeLibrary = [
     description: 'Successfully complete a training program',
     category: 'milestone',
     icon: 'graduation',
-    tiers: ['gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === STREAKS ===
@@ -616,7 +640,7 @@ const badgeLibrary = [
     description: '7 consecutive training days',
     category: 'streak',
     icon: 'flame',
-    tiers: ['bronze'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
   },
   {
     id: 'streak-month',
@@ -624,7 +648,7 @@ const badgeLibrary = [
     description: '30 consecutive training days',
     category: 'streak',
     icon: 'flame',
-    tiers: ['silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
   },
   {
     id: 'streak-quarter',
@@ -632,7 +656,7 @@ const badgeLibrary = [
     description: '90 consecutive training days',
     category: 'streak',
     icon: 'flame',
-    tiers: ['gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'streak-year',
@@ -640,17 +664,17 @@ const badgeLibrary = [
     description: '365 consecutive training days',
     category: 'streak',
     icon: 'crown',
-    tiers: ['diamond'] as BadgeTier[],
+    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === SPECIAL ACHIEVEMENTS ===
   {
     id: 'early-bird',
     name: 'Early Bird',
-    description: 'Morning training sessions',
+    description: 'Morning training sessions before 7 AM',
     category: 'special',
-    icon: 'sun',
-    tiers: ['bronze', 'silver'] as BadgeTier[],
+    icon: 'sunrise',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'night-owl',
@@ -658,7 +682,7 @@ const badgeLibrary = [
     description: 'Evening training dedication',
     category: 'special',
     icon: 'moon',
-    tiers: ['bronze', 'silver'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'quick-learner',
@@ -666,7 +690,7 @@ const badgeLibrary = [
     description: 'Mastered skill in under 3 days',
     category: 'special',
     icon: 'zap',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'perfect-session',
@@ -674,7 +698,7 @@ const badgeLibrary = [
     description: 'Flawless training performance',
     category: 'special',
     icon: 'star',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'comeback-kid',
@@ -682,7 +706,7 @@ const badgeLibrary = [
     description: 'Overcame a training challenge',
     category: 'special',
     icon: 'trending',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'celebration',
@@ -690,7 +714,7 @@ const badgeLibrary = [
     description: 'Special achievement unlocked',
     category: 'special',
     icon: 'party',
-    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === FAMILY/PET PARENT BADGES ===
@@ -700,7 +724,7 @@ const badgeLibrary = [
     description: 'Most engaged pet parent this month',
     category: 'family',
     icon: 'trophy',
-    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'photo-pro',
@@ -708,7 +732,7 @@ const badgeLibrary = [
     description: 'Uploaded 50+ photos to gallery',
     category: 'family',
     icon: 'camera',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'comm-star',
@@ -716,7 +740,7 @@ const badgeLibrary = [
     description: 'Responds quickly to updates',
     category: 'family',
     icon: 'message',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'homework-hero',
@@ -724,7 +748,7 @@ const badgeLibrary = [
     description: 'Consistently follows training homework',
     category: 'family',
     icon: 'check',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'event-attendee',
@@ -732,7 +756,7 @@ const badgeLibrary = [
     description: 'Attended graduation or demo day',
     category: 'family',
     icon: 'party',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'referral-champ',
@@ -740,7 +764,7 @@ const badgeLibrary = [
     description: 'Referred new clients to training',
     category: 'family',
     icon: 'users',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'loyal-client',
@@ -748,7 +772,7 @@ const badgeLibrary = [
     description: '1+ year training relationship',
     category: 'family',
     icon: 'heart',
-    tiers: ['silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'video-star',
@@ -756,7 +780,7 @@ const badgeLibrary = [
     description: 'Shared training progress videos',
     category: 'family',
     icon: 'video',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === TRAINER BADGES ===
@@ -774,7 +798,7 @@ const badgeLibrary = [
     description: 'Trained and guided new trainers',
     category: 'trainer',
     icon: 'helping',
-    tiers: ['silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'attendance-perfect',
@@ -782,7 +806,7 @@ const badgeLibrary = [
     description: 'No missed shifts this month',
     category: 'trainer',
     icon: 'calendar',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'graduation-guru',
@@ -790,7 +814,7 @@ const badgeLibrary = [
     description: 'Graduated 10+ dogs successfully',
     category: 'trainer',
     icon: 'graduation',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'behavior-specialist',
@@ -798,7 +822,7 @@ const badgeLibrary = [
     description: 'Resolved complex behavioral cases',
     category: 'trainer',
     icon: 'brain',
-    tiers: ['silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'customer-champ',
@@ -806,7 +830,7 @@ const badgeLibrary = [
     description: 'High parent satisfaction scores',
     category: 'trainer',
     icon: 'thumbsup',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'cert-master',
@@ -814,7 +838,7 @@ const badgeLibrary = [
     description: 'Multiple professional certifications',
     category: 'trainer',
     icon: 'badge',
-    tiers: ['silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'innovator',
@@ -822,7 +846,7 @@ const badgeLibrary = [
     description: 'Created new training methods',
     category: 'trainer',
     icon: 'lightbulb',
-    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'team-player',
@@ -830,17 +854,277 @@ const badgeLibrary = [
     description: 'Excellent collaboration with team',
     category: 'trainer',
     icon: 'group',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
-  // === FITNESS & ACTIVITY BADGES ===
+  // === RUNNING & JOGGING BADGES ===
+  {
+    id: 'first-run',
+    name: 'First Run',
+    description: 'First outdoor running session',
+    category: 'fitness',
+    icon: 'footprints',
+    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+  },
+  {
+    id: '5k-champion',
+    name: '5K Champion',
+    description: 'Completed first 5K run together',
+    category: 'fitness',
+    icon: 'medal',
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+  },
+  {
+    id: '10k-warrior',
+    name: '10K Warrior',
+    description: 'Conquered the 10K distance',
+    category: 'fitness',
+    icon: 'medal',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'marathon-master',
+    name: 'Marathon Master',
+    description: 'Finished a full marathon together',
+    category: 'fitness',
+    icon: 'trophy',
+    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'speed-demon',
+    name: 'Speed Demon',
+    description: 'Personal best time achieved',
+    category: 'fitness',
+    icon: 'zap',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+
+  // === HIKING & TRAIL BADGES ===
+  {
+    id: 'trailblazer',
+    name: 'Trailblazer',
+    description: 'First hiking adventure completed',
+    category: 'fitness',
+    icon: 'map',
+    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+  },
+  {
+    id: 'summit-seeker',
+    name: 'Summit Seeker',
+    description: 'Reached a mountain peak',
+    category: 'fitness',
+    icon: 'mountain',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'forest-explorer',
+    name: 'Forest Explorer',
+    description: 'Completed forest trail adventures',
+    category: 'fitness',
+    icon: 'tree',
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+  },
+  {
+    id: '50-mile-club',
+    name: '50 Mile Club',
+    description: '50 miles of hiking logged',
+    category: 'fitness',
+    icon: 'mappin',
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+  },
+  {
+    id: '100-mile-legend',
+    name: '100 Mile Legend',
+    description: '100 miles hiking milestone',
+    category: 'fitness',
+    icon: 'medal',
+    tiers: ['silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'trail-master',
+    name: 'Trail Master',
+    description: '250+ miles conquered on trails',
+    category: 'fitness',
+    icon: 'crown',
+    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+
+  // === CYCLING BADGES ===
+  {
+    id: 'bike-buddy',
+    name: 'Bike Buddy',
+    description: 'First cycling session together',
+    category: 'fitness',
+    icon: 'bike',
+    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+  },
+  {
+    id: 'trail-rider',
+    name: 'Trail Rider',
+    description: 'Off-road cycling adventure',
+    category: 'fitness',
+    icon: 'bike',
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+  },
+  {
+    id: 'century-cyclist',
+    name: 'Century Cyclist',
+    description: '100 mile cycling achievement',
+    category: 'fitness',
+    icon: 'trophy',
+    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+
+  // === SWIMMING & WATER BADGES ===
+  {
+    id: 'water-pup',
+    name: 'Water Pup',
+    description: 'First swimming session',
+    category: 'fitness',
+    icon: 'droplets',
+    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+  },
+  {
+    id: 'lake-explorer',
+    name: 'Lake Explorer',
+    description: 'Open water swimming adventures',
+    category: 'fitness',
+    icon: 'waves',
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+  },
+  {
+    id: 'beach-lover',
+    name: 'Beach Lover',
+    description: 'Beach running and swimming',
+    category: 'fitness',
+    icon: 'waves',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'dock-diver',
+    name: 'Dock Diver',
+    description: 'Dock diving training mastery',
+    category: 'fitness',
+    icon: 'anchor',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'swim-star',
+    name: 'Swimming Star',
+    description: 'Pool or water training sessions',
+    category: 'fitness',
+    icon: 'waves',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+
+  // === OUTDOOR ADVENTURE BADGES ===
+  {
+    id: 'camp-companion',
+    name: 'Camp Companion',
+    description: 'Overnight camping trip partner',
+    category: 'fitness',
+    icon: 'tent',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'sunrise-chaser',
+    name: 'Sunrise Chaser',
+    description: 'Dawn outdoor adventure sessions',
+    category: 'fitness',
+    icon: 'sunrise',
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+  },
+  {
+    id: 'wilderness-explorer',
+    name: 'Wilderness Explorer',
+    description: 'Backcountry adventures mastered',
+    category: 'fitness',
+    icon: 'compass',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'all-terrain-pup',
+    name: 'All-Terrain Pup',
+    description: 'Various terrain mastery',
+    category: 'fitness',
+    icon: 'mountain',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'pack-leader',
+    name: 'Pack Leader',
+    description: 'Expedition leader status achieved',
+    category: 'fitness',
+    icon: 'backpack',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'adventure-dog',
+    name: 'Adventure Dog',
+    description: 'Trail and hiking training',
+    category: 'fitness',
+    icon: 'mountain',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+
+  // === FITNESS MILESTONES ===
+  {
+    id: 'first-steps',
+    name: 'First Steps',
+    description: 'First fitness milestone achieved',
+    category: 'fitness',
+    icon: 'footprints',
+    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+  },
+  {
+    id: '10k-steps',
+    name: '10K Steps',
+    description: '10,000 steps in a single day',
+    category: 'fitness',
+    icon: 'activity',
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+  },
+  {
+    id: 'streak-master',
+    name: 'Streak Master',
+    description: '7-day consecutive activity streak',
+    category: 'fitness',
+    icon: 'flame',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: '30-day-challenge',
+    name: '30 Day Challenge',
+    description: 'Month of daily activity completed',
+    category: 'fitness',
+    icon: 'calendar',
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'iron-paws',
+    name: 'Iron Paws',
+    description: 'Elite fitness level achieved',
+    category: 'fitness',
+    icon: 'dumbbell',
+    tiers: ['silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'ultimate-athlete',
+    name: 'Ultimate Athlete',
+    description: 'Peak physical conditioning',
+    category: 'fitness',
+    icon: 'rocket',
+    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+
+  // === EXISTING FITNESS BADGES (updated with full tiers) ===
   {
     id: 'first-walk',
     name: 'First Walk',
     description: 'Completed first outdoor walk',
     category: 'fitness',
     icon: 'footprints',
-    tiers: ['bronze'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
   },
   {
     id: 'walker-5k',
@@ -848,7 +1132,7 @@ const badgeLibrary = [
     description: 'Walked 5 kilometers total',
     category: 'fitness',
     icon: 'route',
-    tiers: ['bronze'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
   },
   {
     id: 'walker-10k',
@@ -856,7 +1140,7 @@ const badgeLibrary = [
     description: 'Walked 10 kilometers total',
     category: 'fitness',
     icon: 'route',
-    tiers: ['silver'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
   },
   {
     id: 'marathon',
@@ -864,7 +1148,7 @@ const badgeLibrary = [
     description: '26.2 miles walked total',
     category: 'fitness',
     icon: 'medal',
-    tiers: ['gold'] as BadgeTier[],
+    tiers: ['silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'century-club',
@@ -872,7 +1156,7 @@ const badgeLibrary = [
     description: '100 miles walked total',
     category: 'fitness',
     icon: 'trophy',
-    tiers: ['platinum', 'diamond'] as BadgeTier[],
+    tiers: ['gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'cardio-king',
@@ -880,7 +1164,7 @@ const badgeLibrary = [
     description: 'High activity training sessions',
     category: 'fitness',
     icon: 'dumbbell',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'endurance-expert',
@@ -888,7 +1172,7 @@ const badgeLibrary = [
     description: 'Long duration training sessions',
     category: 'fitness',
     icon: 'timer',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'agility-star',
@@ -899,28 +1183,12 @@ const badgeLibrary = [
     tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
-    id: 'swim-star',
-    name: 'Swimming Star',
-    description: 'Pool or water training sessions',
-    category: 'fitness',
-    icon: 'waves',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
-  },
-  {
-    id: 'adventure-dog',
-    name: 'Adventure Dog',
-    description: 'Trail and hiking training',
-    category: 'fitness',
-    icon: 'mountain',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
-  },
-  {
     id: 'urban-explorer',
     name: 'Urban Explorer',
     description: 'City environment walks',
     category: 'fitness',
     icon: 'building',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'park-hopper',
@@ -928,7 +1196,7 @@ const badgeLibrary = [
     description: 'Visited multiple parks',
     category: 'fitness',
     icon: 'tree',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 
   // === WEATHER & ENVIRONMENT BADGES ===
@@ -938,7 +1206,7 @@ const badgeLibrary = [
     description: 'Trained in rain or challenging weather',
     category: 'environment',
     icon: 'rain',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'snow-trooper',
@@ -946,7 +1214,7 @@ const badgeLibrary = [
     description: 'Trained in snowy conditions',
     category: 'environment',
     icon: 'snow',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'distraction-destroyer',
@@ -954,7 +1222,7 @@ const badgeLibrary = [
     description: 'Focused around major distractions',
     category: 'environment',
     icon: 'eye',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'sound-steady',
@@ -962,7 +1230,15 @@ const badgeLibrary = [
     description: 'Calm around loud noises',
     category: 'environment',
     icon: 'ear',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
+  },
+  {
+    id: 'wind-walker',
+    name: 'Wind Walker',
+    description: 'Calm in windy conditions',
+    category: 'environment',
+    icon: 'wind',
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
   },
 
   // === FUN & CELEBRATION BADGES ===
@@ -972,7 +1248,7 @@ const badgeLibrary = [
     description: 'Celebrated training birthday',
     category: 'fun',
     icon: 'cake',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'holiday-hero',
@@ -980,7 +1256,7 @@ const badgeLibrary = [
     description: 'Training on holidays',
     category: 'fun',
     icon: 'gift',
-    tiers: ['bronze', 'silver'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
   },
   {
     id: 'weekend-warrior',
@@ -988,7 +1264,7 @@ const badgeLibrary = [
     description: 'Dedicated weekend sessions',
     category: 'fun',
     icon: 'sun',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'photogenic',
@@ -996,7 +1272,7 @@ const badgeLibrary = [
     description: 'Best photo of the month',
     category: 'fun',
     icon: 'camera',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'focus-master',
@@ -1004,7 +1280,7 @@ const badgeLibrary = [
     description: 'Extended attention span achieved',
     category: 'fun',
     icon: 'brain',
-    tiers: ['bronze', 'silver', 'gold', 'platinum'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'vet-ready',
@@ -1012,7 +1288,7 @@ const badgeLibrary = [
     description: 'Calm during vet visits',
     category: 'fun',
     icon: 'usercheck',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
   {
     id: 'groomer-friendly',
@@ -1020,7 +1296,7 @@ const badgeLibrary = [
     description: 'Cooperative during grooming',
     category: 'fun',
     icon: 'sparkles',
-    tiers: ['bronze', 'silver', 'gold'] as BadgeTier[],
+    tiers: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] as BadgeTier[],
   },
 ];
 
