@@ -143,6 +143,7 @@ export default function TrainersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTrainer, setSelectedTrainer] = useState<typeof demoTrainers[0] | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingTrainer, setEditingTrainer] = useState<typeof demoTrainers[0] | null>(null);
 
   const filteredTrainers = demoTrainers.filter((trainer) =>
     trainer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -298,6 +299,7 @@ export default function TrainersPage() {
                   size="sm"
                   className="flex-1"
                   leftIcon={<Edit size={14} />}
+                  onClick={() => setEditingTrainer(trainer)}
                 >
                   Edit
                 </Button>
@@ -390,8 +392,92 @@ export default function TrainersPage() {
               <Button variant="outline" className="flex-1" onClick={() => setSelectedTrainer(null)}>
                 Close
               </Button>
-              <Button variant="primary" className="flex-1" leftIcon={<Edit size={16} />}>
+              <Button
+                variant="primary"
+                className="flex-1"
+                leftIcon={<Edit size={16} />}
+                onClick={() => {
+                  setSelectedTrainer(null);
+                  setEditingTrainer(selectedTrainer);
+                }}
+              >
                 Edit Trainer
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Edit Trainer Modal */}
+      <Modal
+        isOpen={!!editingTrainer}
+        onClose={() => setEditingTrainer(null)}
+        title="Edit Trainer"
+      >
+        {editingTrainer && (
+          <div className="space-y-4">
+            <Input
+              label="Full Name"
+              placeholder="Enter trainer's name"
+              defaultValue={editingTrainer.name}
+            />
+            <Input
+              label="Email"
+              type="email"
+              placeholder="trainer@example.com"
+              defaultValue={editingTrainer.email}
+            />
+            <Input
+              label="Phone"
+              type="tel"
+              placeholder="(555) 555-5555"
+              defaultValue={editingTrainer.phone}
+            />
+            <div>
+              <label className="block text-sm font-medium text-surface-300 mb-2">Role</label>
+              <select
+                className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-white focus:border-brand-500 focus:outline-none"
+                defaultValue={editingTrainer.role}
+              >
+                <option value="trainer">Trainer</option>
+                <option value="lead_trainer">Lead Trainer</option>
+                <option value="assistant">Assistant</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-surface-300 mb-2">Status</label>
+              <select
+                className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-white focus:border-brand-500 focus:outline-none"
+                defaultValue={editingTrainer.status}
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-surface-300 mb-2">
+                Specialties (comma-separated)
+              </label>
+              <Input
+                placeholder="Obedience, Behavior Modification, Puppy Training"
+                defaultValue={editingTrainer.specialties.join(', ')}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-surface-300 mb-2">
+                Certifications (comma-separated)
+              </label>
+              <Input
+                placeholder="CPDT-KA, AKC CGC Evaluator"
+                defaultValue={editingTrainer.certifications.join(', ')}
+              />
+            </div>
+            <div className="flex gap-3 pt-4">
+              <Button variant="outline" className="flex-1" onClick={() => setEditingTrainer(null)}>
+                Cancel
+              </Button>
+              <Button variant="primary" className="flex-1">
+                Save Changes
               </Button>
             </div>
           </div>

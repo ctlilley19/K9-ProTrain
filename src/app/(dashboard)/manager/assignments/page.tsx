@@ -117,6 +117,7 @@ export default function AssignmentsPage() {
   const [trainerFilter, setTrainerFilter] = useState('all');
   const [expandedAssignment, setExpandedAssignment] = useState<string | null>(null);
   const [showReassignModal, setShowReassignModal] = useState(false);
+  const [showNewAssignmentModal, setShowNewAssignmentModal] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<typeof demoAssignments[0] | null>(null);
 
   const filteredAssignments = useMemo(() => {
@@ -155,7 +156,11 @@ export default function AssignmentsPage() {
         description="Manage trainer-dog assignments and workload distribution"
         icon={<Target className="text-purple-400" size={24} />}
         action={
-          <Button variant="primary" leftIcon={<Plus size={18} />}>
+          <Button
+            variant="primary"
+            leftIcon={<Plus size={18} />}
+            onClick={() => setShowNewAssignmentModal(true)}
+          >
             New Assignment
           </Button>
         }
@@ -372,6 +377,99 @@ export default function AssignmentsPage() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* New Assignment Modal */}
+      <Modal
+        isOpen={showNewAssignmentModal}
+        onClose={() => setShowNewAssignmentModal(false)}
+        title="Create New Assignment"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-surface-300 mb-2">
+              Select Dog
+            </label>
+            <select className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+              <option value="">Choose a dog...</option>
+              <option value="new1">Buddy - Labrador (Unassigned)</option>
+              <option value="new2">Duke - German Shepherd (Unassigned)</option>
+              <option value="new3">Molly - Beagle (Unassigned)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-surface-300 mb-2">
+              Assign to Trainer
+            </label>
+            <select className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+              <option value="">Choose a trainer...</option>
+              {trainers.map((trainer) => (
+                <option key={trainer.id} value={trainer.id}>
+                  {trainer.name} ({trainer.dogsAssigned} current dogs)
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-surface-300 mb-2">
+              Program
+            </label>
+            <select className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+              <option value="">Choose a program...</option>
+              <option value="p1">2-Week Board & Train</option>
+              <option value="p2">3-Week Board & Train</option>
+              <option value="p3">Day Training</option>
+              <option value="p4">Puppy Foundation</option>
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-surface-300 mb-2">
+                Start Date
+              </label>
+              <input
+                type="date"
+                className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-white focus:border-brand-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-surface-300 mb-2">
+                End Date
+              </label>
+              <input
+                type="date"
+                className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-white focus:border-brand-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-surface-300 mb-2">
+              Notes (optional)
+            </label>
+            <textarea
+              className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-white focus:border-brand-500 focus:outline-none resize-none"
+              rows={3}
+              placeholder="Add any special notes or focus areas..."
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setShowNewAssignmentModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="primary" className="flex-1" leftIcon={<Plus size={16} />}>
+              Create Assignment
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

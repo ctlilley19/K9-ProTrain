@@ -219,7 +219,10 @@ export function Sidebar() {
               {isCollapsed && <div className="border-t border-surface-700 mx-2" />}
             </div>
             {filteredManagerItems.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              // For 'Manager' item, only exact match; for sub-items, allow startsWith
+              const isActive = item.href === '/manager'
+                ? pathname === '/manager'
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
               return (
                 <Link
