@@ -90,51 +90,51 @@ export default function PetParentAchievementsPage() {
         </p>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card className="bg-gradient-to-br from-brand-500/20 to-brand-500/5">
-          <CardContent className="p-4 text-center">
-            <Award size={24} className="mx-auto text-brand-400 mb-2" />
-            <p className="text-2xl font-bold text-white">{data.stats.total_badges}</p>
-            <p className="text-xs text-surface-500">Total Badges</p>
+      {/* Stats Overview - Horizontal scroll on mobile */}
+      <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-5 sm:gap-4 sm:overflow-visible">
+        <Card className="bg-gradient-to-br from-brand-500/20 to-brand-500/5 flex-shrink-0 w-24 sm:w-auto">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Award size={20} className="mx-auto text-brand-400 mb-1" />
+            <p className="text-xl font-bold text-white">{data.stats.total_badges}</p>
+            <p className="text-[10px] text-surface-500">Total</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-yellow-500/20 to-yellow-500/5">
-          <CardContent className="p-4 text-center">
-            <Star size={24} className="mx-auto text-yellow-400 mb-2" />
-            <p className="text-2xl font-bold text-white">{data.stats.gold_badges}</p>
-            <p className="text-xs text-surface-500">Gold</p>
+        <Card className="bg-gradient-to-br from-yellow-500/20 to-yellow-500/5 flex-shrink-0 w-24 sm:w-auto">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Star size={20} className="mx-auto text-yellow-400 mb-1" />
+            <p className="text-xl font-bold text-white">{data.stats.gold_badges}</p>
+            <p className="text-[10px] text-surface-500">Gold</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-gray-400/20 to-gray-400/5">
-          <CardContent className="p-4 text-center">
-            <Star size={24} className="mx-auto text-gray-300 mb-2" />
-            <p className="text-2xl font-bold text-white">{data.stats.silver_badges}</p>
-            <p className="text-xs text-surface-500">Silver</p>
+        <Card className="bg-gradient-to-br from-gray-400/20 to-gray-400/5 flex-shrink-0 w-24 sm:w-auto">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Star size={20} className="mx-auto text-gray-300 mb-1" />
+            <p className="text-xl font-bold text-white">{data.stats.silver_badges}</p>
+            <p className="text-[10px] text-surface-500">Silver</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-orange-500/20 to-orange-500/5">
-          <CardContent className="p-4 text-center">
-            <Star size={24} className="mx-auto text-orange-400 mb-2" />
-            <p className="text-2xl font-bold text-white">{data.stats.bronze_badges}</p>
-            <p className="text-xs text-surface-500">Bronze</p>
+        <Card className="bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex-shrink-0 w-24 sm:w-auto">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Star size={20} className="mx-auto text-orange-400 mb-1" />
+            <p className="text-xl font-bold text-white">{data.stats.bronze_badges}</p>
+            <p className="text-[10px] text-surface-500">Bronze</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-purple-500/20 to-purple-500/5">
-          <CardContent className="p-4 text-center">
-            <Trophy size={24} className="mx-auto text-purple-400 mb-2" />
-            <p className="text-2xl font-bold text-white">{data.stats.categories_unlocked}</p>
-            <p className="text-xs text-surface-500">Categories</p>
+        <Card className="bg-gradient-to-br from-purple-500/20 to-purple-500/5 flex-shrink-0 w-24 sm:w-auto">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Trophy size={20} className="mx-auto text-purple-400 mb-1" />
+            <p className="text-xl font-bold text-white">{data.stats.categories_unlocked}</p>
+            <p className="text-[10px] text-surface-500">Categories</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Dog Progress Cards */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         {data.dogs.map((dog) => (
           <Card key={dog.id}>
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4 mb-4">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-start gap-3 sm:gap-4 mb-4">
                 <Avatar name={dog.name} size="lg" src={dog.photo_url} />
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-white">{dog.name}</h3>
@@ -198,25 +198,23 @@ export default function PetParentAchievementsPage() {
             </select>
           }
         />
-        <CardContent className="p-6">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <CardContent className="p-4 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {filteredBadges.map((badge) => (
               <div
                 key={badge.id}
-                className="flex items-center gap-4 p-4 rounded-xl bg-surface-800/50 border border-surface-700 hover:border-surface-600 transition-colors"
+                className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-surface-800/50 border border-surface-700 hover:border-surface-600 transition-colors"
               >
-                <TierBadge tier={badge.tier as 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond'} size="lg">
-                  <BadgeIcon icon={badge.icon} size={20} />
+                <TierBadge tier={badge.tier as 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond'} size="md">
+                  <BadgeIcon icon={badge.icon} size={16} />
                 </TierBadge>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-white truncate">{badge.name}</p>
-                  </div>
-                  <p className="text-sm text-surface-500 truncate">{badge.description}</p>
+                  <p className="font-medium text-white text-sm sm:text-base truncate">{badge.name}</p>
+                  <p className="text-xs sm:text-sm text-surface-500 truncate">{badge.description}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-surface-600">{badge.dog_name}</span>
-                    <span className="text-xs text-surface-600">•</span>
-                    <span className="text-xs text-surface-600">
+                    <span className="text-[10px] sm:text-xs text-surface-600">{badge.dog_name}</span>
+                    <span className="text-[10px] sm:text-xs text-surface-600">•</span>
+                    <span className="text-[10px] sm:text-xs text-surface-600">
                       {formatDate(badge.earned_at)}
                     </span>
                   </div>
@@ -230,8 +228,8 @@ export default function PetParentAchievementsPage() {
       {/* Available Badges */}
       <Card>
         <CardHeader title="All Available Badges" />
-        <CardContent className="p-6">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <CardContent className="p-4 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {data.available_badges.map((badge, idx) => (
               <div
                 key={idx}

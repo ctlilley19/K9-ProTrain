@@ -803,8 +803,11 @@ export function useStartActivity() {
       return activitiesService.start(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['training-board'] });
-      queryClient.invalidateQueries({ queryKey: ['activities'] });
+      // Don't invalidate in demo mode - let optimistic updates persist
+      if (!isDemoMode()) {
+        queryClient.invalidateQueries({ queryKey: ['training-board'] });
+        queryClient.invalidateQueries({ queryKey: ['activities'] });
+      }
     },
   });
 }
@@ -824,8 +827,11 @@ export function useEndActivity() {
       return activitiesService.end(activityId, notes);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['training-board'] });
-      queryClient.invalidateQueries({ queryKey: ['activities'] });
+      // Don't invalidate in demo mode - let optimistic updates persist
+      if (!isDemoMode()) {
+        queryClient.invalidateQueries({ queryKey: ['training-board'] });
+        queryClient.invalidateQueries({ queryKey: ['activities'] });
+      }
     },
   });
 }
@@ -865,8 +871,11 @@ export function useQuickLog() {
       return activitiesService.quickLog(dogId, programId, type, user.id, durationMinutes, notes);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['training-board'] });
-      queryClient.invalidateQueries({ queryKey: ['activities'] });
+      // Don't invalidate in demo mode - let optimistic updates persist
+      if (!isDemoMode()) {
+        queryClient.invalidateQueries({ queryKey: ['training-board'] });
+        queryClient.invalidateQueries({ queryKey: ['activities'] });
+      }
     },
   });
 }

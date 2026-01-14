@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { StatusBadge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
+import { AddDogModal } from '@/components/dogs/AddDogModal';
 import { cn } from '@/lib/utils';
 import { useDogsWithPrograms, useFamilies, useDogBadges } from '@/hooks';
 import {
@@ -74,6 +75,7 @@ export default function DogsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const { data: dogs, isLoading, error, refetch } = useDogsWithPrograms();
   const { data: families } = useFamilies();
@@ -142,11 +144,13 @@ export default function DogsPage() {
         title="Dogs"
         description="Manage all dogs in your facility"
         action={
-          <Link href="/dogs/new">
-            <Button variant="primary" leftIcon={<Plus size={18} />}>
-              Add Dog
-            </Button>
-          </Link>
+          <Button
+            variant="primary"
+            leftIcon={<Plus size={18} />}
+            onClick={() => setIsAddModalOpen(true)}
+          >
+            Add Dog
+          </Button>
         }
       />
 
@@ -330,13 +334,31 @@ export default function DogsPage() {
               ? 'Try adjusting your search or filters'
               : 'Add your first dog to get started'}
           </p>
-          <Link href="/dogs/new">
-            <Button variant="primary" leftIcon={<Plus size={18} />}>
-              Add Dog
-            </Button>
-          </Link>
+          <Button
+            variant="primary"
+            leftIcon={<Plus size={18} />}
+            onClick={() => setIsAddModalOpen(true)}
+          >
+            Add Dog
+          </Button>
         </Card>
       )}
+
+      {/* Add Dog Modal */}
+      <AddDogModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={() => refetch()}
+      />
+
+      {/* Mobile FAB */}
+      <button
+        onClick={() => setIsAddModalOpen(true)}
+        className="fixed bottom-20 right-4 sm:hidden w-14 h-14 rounded-full bg-brand-500 text-white shadow-lg flex items-center justify-center hover:bg-brand-400 active:scale-95 transition-all z-40"
+        aria-label="Add Dog"
+      >
+        <Plus size={24} />
+      </button>
     </div>
   );
 }

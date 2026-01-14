@@ -16,6 +16,7 @@ import { ActivityBadge } from '@/components/ui/Badge';
 import { ActivityCard, QuickLogFAB, type ActivityDog } from '@/components/training';
 import { cn, activityConfig, type ActivityType } from '@/lib/utils';
 import { useTrainingBoard, useStartActivity, useEndActivity, useQuickLog, type TrainingBoardDog } from '@/hooks';
+import { isDemoMode } from '@/lib/supabase';
 import { useUser } from '@/stores/authStore';
 import {
   Dog,
@@ -180,8 +181,10 @@ export default function TrainingBoardPage() {
           });
         } catch (err) {
           console.error('Failed to update activity:', err);
-          // Revert on error - refetch will restore correct state
-          refetch();
+          // Revert on error - refetch will restore correct state (only in production mode)
+          if (!isDemoMode()) {
+            refetch();
+          }
         }
       }
     },
@@ -241,7 +244,9 @@ export default function TrainingBoardPage() {
         });
       } catch (err) {
         console.error('Failed to log activity:', err);
-        refetch();
+        if (!isDemoMode()) {
+          refetch();
+        }
       }
     },
     [columns, endActivity, startActivity, user?.id, refetch]
@@ -303,7 +308,9 @@ export default function TrainingBoardPage() {
         });
       } catch (err) {
         console.error('Failed to end activity:', err);
-        refetch();
+        if (!isDemoMode()) {
+          refetch();
+        }
       }
     },
     [columns, endActivity, startActivity, user?.id, refetch]
