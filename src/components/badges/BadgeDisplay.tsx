@@ -85,6 +85,7 @@ interface BadgeCardProps {
   description: string;
   icon: React.ReactNode;
   locked?: boolean;
+  selected?: boolean;
   size?: 'sm' | 'md' | 'lg';
   onClick?: () => void;
 }
@@ -96,6 +97,7 @@ export function BadgeCard({
   description,
   icon,
   locked = false,
+  selected = false,
   size = 'md',
   onClick,
 }: BadgeCardProps) {
@@ -119,20 +121,43 @@ export function BadgeCard({
       className={cn(
         'relative flex flex-col items-center rounded-2xl',
         'bg-gradient-to-br from-surface-800/90 to-surface-900/95',
-        'border border-white/[0.06] transition-all duration-300',
+        'border transition-all duration-300',
         'hover:translate-y-[-4px] hover:border-white/10',
         locked && 'opacity-35 grayscale pointer-events-none',
         tier === 'diamond' && !locked && 'animate-diamond-border',
         onClick && 'cursor-pointer',
+        selected
+          ? 'border-2 scale-105 animate-badge-selected'
+          : 'border-white/[0.06]',
         sizeClasses[size]
       )}
       style={{
-        boxShadow: locked ? 'none' : `0 20px 40px -10px rgba(0,0,0,0.5), 0 0 30px -5px ${style.stroke}33`,
+        boxShadow: locked
+          ? 'none'
+          : selected
+            ? `0 0 0 4px ${style.stroke}40, 0 20px 40px -10px rgba(0,0,0,0.5), 0 0 40px -5px ${style.stroke}66`
+            : `0 20px 40px -10px rgba(0,0,0,0.5), 0 0 30px -5px ${style.stroke}33`,
+        borderColor: selected ? style.stroke : undefined,
       }}
     >
+      {/* Selection checkmark */}
+      {selected && (
+        <div
+          className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center animate-bounce-in z-10"
+          style={{ backgroundColor: style.stroke }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+      )}
+
       {/* Top gradient line */}
       <div
-        className="absolute top-0 left-0 right-0 h-[1px] rounded-t-2xl opacity-60"
+        className={cn(
+          "absolute top-0 left-0 right-0 h-[1px] rounded-t-2xl",
+          selected ? "opacity-100 h-[2px]" : "opacity-60"
+        )}
         style={{
           background: `linear-gradient(90deg, ${style.stroke}, ${style.stroke}99, ${style.stroke})`,
         }}
@@ -144,29 +169,41 @@ export function BadgeCard({
           'relative rounded-full flex items-center justify-center mb-4',
           `bg-gradient-to-br ${style.gradient}`,
           !locked && style.glow,
-          tier === 'diamond' && !locked && 'animate-pulse-glow',
+          (tier === 'diamond' && !locked) || selected ? 'animate-pulse-glow' : '',
           iconSizeClasses[size]
         )}
+        style={selected ? { '--badge-glow': style.stroke + '80', '--badge-glow-outer': style.stroke + '40' } as React.CSSProperties : {}}
       >
         {/* Shimmer effect */}
         <div className="absolute inset-0 rounded-full overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+          <div className={cn(
+            "absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700",
+            selected ? "animate-shimmer-continuous" : "-translate-x-full group-hover:translate-x-full"
+          )} />
         </div>
 
-        {/* Sparkle for gold/diamond */}
-        {(tier === 'gold' || tier === 'diamond') && !locked && (
+        {/* Sparkle for gold/diamond or selected */}
+        {((tier === 'gold' || tier === 'diamond') && !locked) || selected ? (
           <span
             className="absolute top-1 right-1 text-[10px] animate-sparkle"
             style={{ color: style.stroke, textShadow: `0 0 6px ${style.stroke}` }}
           >
             ✦
           </span>
-        )}
+        ) : null}
 
-        <span style={{ filter: `drop-shadow(0 0 4px ${style.stroke})` }}>{icon}</span>
+        <span
+          className={cn(selected && "animate-icon-pop")}
+          style={{ filter: `drop-shadow(0 0 ${selected ? '8px' : '4px'} ${style.stroke})` }}
+        >
+          {icon}
+        </span>
       </div>
 
-      <h3 className="text-[15px] font-semibold text-slate-100 text-center mb-1">{title}</h3>
+      <h3 className={cn(
+        "text-[15px] font-semibold text-center mb-1 transition-colors",
+        selected ? "text-white" : "text-slate-100"
+      )}>{title}</h3>
       <p className="text-xs text-gray-500 text-center">{description}</p>
     </div>
   );
