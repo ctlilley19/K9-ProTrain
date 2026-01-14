@@ -14,7 +14,6 @@ import {
   User,
   Settings,
   ChevronDown,
-  Plus,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -62,16 +61,6 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
-          {/* Quick Add Button */}
-          <Button
-            variant="primary"
-            size="sm"
-            leftIcon={<Plus size={16} />}
-            className="hidden sm:flex"
-          >
-            Add Dog
-          </Button>
-
           {/* Notifications */}
           <div className="relative">
             <Button

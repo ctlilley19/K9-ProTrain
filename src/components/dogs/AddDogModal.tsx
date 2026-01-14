@@ -302,51 +302,93 @@ export function AddDogModal({ isOpen, onClose, onSuccess }: AddDogModalProps) {
               </div>
               <h3 className="text-lg font-medium text-white">Who owns this dog?</h3>
               <p className="text-sm text-surface-400">
-                Select an existing family or create a new one
+                Start by selecting or creating a family
               </p>
             </div>
 
-            {/* Create New Family Option */}
-            <button
-              type="button"
-              onClick={() => {
-                setIsCreatingNewFamily(true);
-                updateField('family_id', '');
-              }}
-              className={cn(
-                'w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left',
-                isCreatingNewFamily
-                  ? 'border-green-500 bg-green-500/10'
-                  : 'border-dashed border-surface-600 hover:border-surface-500 bg-surface-800/30'
-              )}
-            >
-              <div
+            {/* Primary Choice: New or Existing */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCreatingNewFamily(true);
+                  updateField('family_id', '');
+                }}
                 className={cn(
-                  'w-10 h-10 rounded-full flex items-center justify-center',
-                  isCreatingNewFamily ? 'bg-green-500' : 'bg-surface-700'
+                  'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                  isCreatingNewFamily
+                    ? 'border-green-500 bg-green-500/10'
+                    : 'border-surface-600 hover:border-surface-500 bg-surface-800/30'
                 )}
               >
-                <Plus
-                  size={20}
-                  className={isCreatingNewFamily ? 'text-white' : 'text-surface-400'}
-                />
-              </div>
-              <span
+                <div
+                  className={cn(
+                    'w-12 h-12 rounded-full flex items-center justify-center',
+                    isCreatingNewFamily ? 'bg-green-500' : 'bg-surface-700'
+                  )}
+                >
+                  <Plus
+                    size={24}
+                    className={isCreatingNewFamily ? 'text-white' : 'text-surface-400'}
+                  />
+                </div>
+                <span
+                  className={cn(
+                    'font-medium text-sm',
+                    isCreatingNewFamily ? 'text-white' : 'text-surface-300'
+                  )}
+                >
+                  New Family
+                </span>
+                {isCreatingNewFamily && (
+                  <Check size={16} className="text-green-400" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCreatingNewFamily(false);
+                }}
                 className={cn(
-                  'font-medium',
-                  isCreatingNewFamily ? 'text-white' : 'text-surface-300'
+                  'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                  !isCreatingNewFamily
+                    ? 'border-brand-500 bg-brand-500/10'
+                    : 'border-surface-600 hover:border-surface-500 bg-surface-800/30'
                 )}
               >
-                Create New Family
-              </span>
-              {isCreatingNewFamily && (
-                <Check size={20} className="ml-auto text-green-400" />
-              )}
-            </button>
+                <div
+                  className={cn(
+                    'w-12 h-12 rounded-full flex items-center justify-center',
+                    !isCreatingNewFamily ? 'bg-brand-500' : 'bg-surface-700'
+                  )}
+                >
+                  <User
+                    size={24}
+                    className={!isCreatingNewFamily ? 'text-white' : 'text-surface-400'}
+                  />
+                </div>
+                <span
+                  className={cn(
+                    'font-medium text-sm',
+                    !isCreatingNewFamily ? 'text-white' : 'text-surface-300'
+                  )}
+                >
+                  Existing Family
+                </span>
+                {!isCreatingNewFamily && formData.family_id && (
+                  <Check size={16} className="text-brand-400" />
+                )}
+              </button>
+            </div>
 
             {/* New Family Form */}
             {isCreatingNewFamily && (
               <div className="p-4 rounded-xl border border-green-500/30 bg-green-500/5 space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Plus size={16} className="text-green-400" />
+                  <span className="text-sm font-medium text-green-400">Create New Family</span>
+                </div>
                 <Input
                   label="Family Name *"
                   value={newFamilyData.name}
@@ -375,54 +417,54 @@ export function AddDogModal({ isOpen, onClose, onSuccess }: AddDogModalProps) {
               </div>
             )}
 
-            {/* Divider */}
+            {/* Existing Families List */}
             {!isCreatingNewFamily && (
-              <div className="flex items-center gap-3 my-2">
-                <div className="flex-1 h-px bg-surface-700" />
-                <span className="text-xs text-surface-500 uppercase">or select existing</span>
-                <div className="flex-1 h-px bg-surface-700" />
-              </div>
-            )}
-
-            {/* Existing Families */}
-            {!isCreatingNewFamily && (
-              <>
+              <div className="p-4 rounded-xl border border-brand-500/30 bg-brand-500/5">
+                <div className="flex items-center gap-2 mb-3">
+                  <User size={16} className="text-brand-400" />
+                  <span className="text-sm font-medium text-brand-400">Select Existing Family</span>
+                </div>
                 {familiesLoading ? (
-                  <div className="flex items-center justify-center py-8">
+                  <div className="flex items-center justify-center py-6">
                     <Loader2 className="w-6 h-6 animate-spin text-brand-500" />
                   </div>
                 ) : familyOptions.length === 0 ? (
-                  <div className="text-center py-6">
-                    <p className="text-surface-400 text-sm">No existing families</p>
-                    <p className="text-surface-500 text-xs">Use "Create New Family" above</p>
+                  <div className="text-center py-4">
+                    <p className="text-surface-400 text-sm">No existing families found</p>
+                    <button
+                      type="button"
+                      onClick={() => setIsCreatingNewFamily(true)}
+                      className="text-green-400 text-sm mt-1 hover:underline"
+                    >
+                      Create a new family instead
+                    </button>
                   </div>
                 ) : (
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
                     {familyOptions.map((family) => (
                       <button
                         key={family.value}
                         type="button"
                         onClick={() => {
-                          setIsCreatingNewFamily(false);
                           updateField('family_id', family.value);
                         }}
                         className={cn(
-                          'w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left',
+                          'w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left',
                           formData.family_id === family.value
-                            ? 'border-brand-500 bg-brand-500/10'
-                            : 'border-surface-700 hover:border-surface-600 bg-surface-800/50'
+                            ? 'border-brand-500 bg-brand-500/20'
+                            : 'border-surface-600 hover:border-surface-500 bg-surface-800/50'
                         )}
                       >
                         <div
                           className={cn(
-                            'w-10 h-10 rounded-full flex items-center justify-center',
+                            'w-8 h-8 rounded-full flex items-center justify-center',
                             formData.family_id === family.value
                               ? 'bg-brand-500'
                               : 'bg-surface-700'
                           )}
                         >
                           <User
-                            size={20}
+                            size={16}
                             className={
                               formData.family_id === family.value
                                 ? 'text-white'
@@ -432,7 +474,7 @@ export function AddDogModal({ isOpen, onClose, onSuccess }: AddDogModalProps) {
                         </div>
                         <span
                           className={cn(
-                            'font-medium',
+                            'font-medium text-sm',
                             formData.family_id === family.value
                               ? 'text-white'
                               : 'text-surface-300'
@@ -441,16 +483,16 @@ export function AddDogModal({ isOpen, onClose, onSuccess }: AddDogModalProps) {
                           {family.label}
                         </span>
                         {formData.family_id === family.value && (
-                          <Check size={20} className="ml-auto text-brand-400" />
+                          <Check size={16} className="ml-auto text-brand-400" />
                         )}
                       </button>
                     ))}
                   </div>
                 )}
-              </>
+              </div>
             )}
             {errors.family_id && !isCreatingNewFamily && (
-              <p className="text-sm text-red-400">{errors.family_id}</p>
+              <p className="text-sm text-red-400 mt-2">{errors.family_id}</p>
             )}
           </div>
         )}
