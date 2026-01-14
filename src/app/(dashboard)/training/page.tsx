@@ -10,9 +10,7 @@ import {
   type DroppableProvided,
 } from '@hello-pangea/dnd';
 import { PageHeader } from '@/components/layout';
-import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { ActivityBadge } from '@/components/ui/Badge';
 import { ActivityCard, QuickLogFAB, type ActivityDog } from '@/components/training';
 import { cn, activityConfig, type ActivityType } from '@/lib/utils';
 import { useTrainingBoard, useStartActivity, useEndActivity, useQuickLog, type TrainingBoardDog } from '@/hooks';
@@ -35,18 +33,18 @@ import {
   AlertCircle,
 } from 'lucide-react';
 
-// Activity icons mapping
-const activityIcons: Record<ActivityType, React.ReactNode> = {
-  kennel: <Home size={16} />,
-  potty: <Droplets size={16} />,
-  training: <GraduationCap size={16} />,
-  play: <Gamepad2 size={16} />,
-  group_play: <Gamepad2 size={16} />,
-  feeding: <UtensilsCrossed size={16} />,
-  rest: <Moon size={16} />,
-  walk: <Dog size={16} />,
-  grooming: <Sparkles size={16} />,
-  medical: <Stethoscope size={16} />,
+// Activity icons mapping with colors for enhanced styling
+const activityIcons: Record<ActivityType, { icon: React.ReactNode; color: string; glow: string }> = {
+  kennel: { icon: <Home size={16} />, color: '#9ca3af', glow: 'rgba(156,163,175,0.4)' },
+  potty: { icon: <Droplets size={16} />, color: '#facc15', glow: 'rgba(250,204,21,0.4)' },
+  training: { icon: <GraduationCap size={16} />, color: '#60a5fa', glow: 'rgba(96,165,250,0.4)' },
+  play: { icon: <Gamepad2 size={16} />, color: '#4ade80', glow: 'rgba(74,222,128,0.4)' },
+  group_play: { icon: <Gamepad2 size={16} />, color: '#4ade80', glow: 'rgba(74,222,128,0.4)' },
+  feeding: { icon: <UtensilsCrossed size={16} />, color: '#a78bfa', glow: 'rgba(167,139,250,0.4)' },
+  rest: { icon: <Moon size={16} />, color: '#38bdf8', glow: 'rgba(56,189,248,0.4)' },
+  walk: { icon: <Dog size={16} />, color: '#fb923c', glow: 'rgba(251,146,60,0.4)' },
+  grooming: { icon: <Sparkles size={16} />, color: '#f472b6', glow: 'rgba(244,114,182,0.4)' },
+  medical: { icon: <Stethoscope size={16} />, color: '#f87171', glow: 'rgba(248,113,113,0.4)' },
 };
 
 // Column configuration
@@ -388,26 +386,37 @@ export default function TrainingBoardPage() {
                 {/* Column Header */}
                 <div
                   className={cn(
-                    'flex items-center gap-2 px-3 py-2 rounded-t-xl border-t-2',
-                    'bg-surface-800/50',
-                    column.id === 'kennel'
-                      ? 'border-t-gray-500'
-                      : column.id === 'potty'
-                      ? 'border-t-yellow-500'
-                      : column.id === 'training'
-                      ? 'border-t-blue-500'
-                      : column.id === 'play'
-                      ? 'border-t-green-500'
-                      : column.id === 'feeding'
-                      ? 'border-t-purple-500'
-                      : 'border-t-sky-500'
+                    'flex items-center gap-3 px-3 py-2.5 rounded-t-xl',
+                    'bg-surface-800/60 backdrop-blur-sm',
+                    'border-t-2'
                   )}
+                  style={{ borderTopColor: activityIcons[column.id].color }}
                 >
-                  <ActivityBadge activity={column.id} size="sm">
-                    {activityIcons[column.id]}
-                  </ActivityBadge>
+                  {/* Enhanced Activity Icon */}
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200"
+                    style={{
+                      background: `linear-gradient(135deg, ${activityIcons[column.id].color}20, ${activityIcons[column.id].color}08)`,
+                      boxShadow: `0 0 12px ${activityIcons[column.id].glow}`,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: activityIcons[column.id].color,
+                        filter: `drop-shadow(0 0 4px ${activityIcons[column.id].glow})`,
+                      }}
+                    >
+                      {activityIcons[column.id].icon}
+                    </span>
+                  </div>
                   <span className="font-medium text-white text-sm">{column.title}</span>
-                  <span className="ml-auto text-xs text-surface-500 bg-surface-700 px-2 py-0.5 rounded-full">
+                  <span
+                    className="ml-auto text-xs font-medium px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: `${activityIcons[column.id].color}15`,
+                      color: activityIcons[column.id].color,
+                    }}
+                  >
                     {dogs.length}
                   </span>
                 </div>
