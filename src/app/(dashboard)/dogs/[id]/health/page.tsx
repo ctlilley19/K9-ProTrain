@@ -533,7 +533,7 @@ export default function DogHealthPage() {
                           <StatusBadge
                             variant={
                               condition.status === 'active'
-                                ? 'error'
+                                ? 'danger'
                                 : condition.status === 'managed'
                                   ? 'warning'
                                   : 'success'
