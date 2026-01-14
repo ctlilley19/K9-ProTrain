@@ -51,7 +51,7 @@ Card.displayName = 'Card';
 
 // Card Header
 export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
-  title?: string;
+  title?: ReactNode;
   description?: string;
   action?: ReactNode;
 }
