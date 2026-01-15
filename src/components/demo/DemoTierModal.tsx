@@ -60,12 +60,11 @@ const personaConfig: Record<DemoPersona, { label: string; description: string; i
   },
 };
 
-const familyTiers: { tier: FamilyTier; name: string; price: string; priceNote?: string; features: { icon: typeof Dog; text: string }[]; highlight?: boolean }[] = [
+const familyTiers: { tier: FamilyTier; name: string; monthlyPrice: number; features: { icon: typeof Dog; text: string }[]; highlight?: boolean }[] = [
   {
     tier: 'free',
     name: 'Free',
-    price: '$0',
-    priceNote: 'forever',
+    monthlyPrice: 0,
     features: [
       { icon: Dog, text: '1 pet' },
       { icon: Image, text: '10 photos/month' },
@@ -75,8 +74,7 @@ const familyTiers: { tier: FamilyTier; name: string; price: string; priceNote?: 
   {
     tier: 'premium',
     name: 'Premium',
-    price: '$10',
-    priceNote: '/month',
+    monthlyPrice: 10,
     features: [
       { icon: Dog, text: 'Up to 5 pets' },
       { icon: MapPin, text: 'GPS route tracking' },
@@ -89,8 +87,7 @@ const familyTiers: { tier: FamilyTier; name: string; price: string; priceNote?: 
   {
     tier: 'pro',
     name: 'Pro',
-    price: '$19',
-    priceNote: '/month',
+    monthlyPrice: 19,
     features: [
       { icon: Check, text: 'Everything in Premium' },
       { icon: BarChart3, text: 'Pet Analytics' },
@@ -100,12 +97,11 @@ const familyTiers: { tier: FamilyTier; name: string; price: string; priceNote?: 
   },
 ];
 
-const businessTiers: { tier: BusinessTier; name: string; price: string; priceNote?: string; features: { icon: typeof Dog; text: string }[]; highlight?: boolean }[] = [
+const businessTiers: { tier: BusinessTier; name: string; monthlyPrice: number; features: { icon: typeof Dog; text: string }[]; highlight?: boolean }[] = [
   {
     tier: 'starter',
     name: 'Starter',
-    price: '$79',
-    priceNote: '/month',
+    monthlyPrice: 79,
     features: [
       { icon: Dog, text: 'Up to 15 dogs' },
       { icon: Users, text: '2 staff accounts' },
@@ -116,8 +112,7 @@ const businessTiers: { tier: BusinessTier; name: string; price: string; priceNot
   {
     tier: 'professional',
     name: 'Pro',
-    price: '$149',
-    priceNote: '/month',
+    monthlyPrice: 149,
     features: [
       { icon: Dog, text: 'Up to 50 dogs' },
       { icon: Users, text: '5 staff accounts' },
@@ -130,8 +125,7 @@ const businessTiers: { tier: BusinessTier; name: string; price: string; priceNot
   {
     tier: 'enterprise',
     name: 'Business',
-    price: '$249',
-    priceNote: '/month',
+    monthlyPrice: 249,
     features: [
       { icon: Dog, text: 'Unlimited dogs' },
       { icon: Users, text: 'Unlimited staff' },
@@ -151,10 +145,29 @@ export function DemoTierModal({ isOpen, onClose }: DemoTierModalProps) {
   const { setDemoPersona, setDemoFamilyTier, setDemoBusinessTier } = useAuthStore();
 
   const [selectedPersona, setSelectedPersona] = useState<DemoPersona>(currentPersona || 'manager');
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
 
   if (!isOpen) return null;
 
   const isFamily = selectedPersona === 'dog_owner';
+  const isAnnual = billingCycle === 'annual';
+
+  // Calculate prices with 15% annual discount
+  const getPrice = (monthlyPrice: number) => {
+    if (monthlyPrice === 0) return { display: '$0', period: 'forever', savings: null };
+    if (isAnnual) {
+      const annualTotal = Math.round(monthlyPrice * 12 * 0.85);
+      const monthlyEquiv = Math.round(annualTotal / 12);
+      const savings = Math.round(monthlyPrice * 12 - annualTotal);
+      return {
+        display: `$${monthlyEquiv}`,
+        period: '/mo',
+        total: `$${annualTotal}/year`,
+        savings: `Save $${savings}`
+      };
+    }
+    return { display: `$${monthlyPrice}`, period: '/mo', savings: null };
+  };
 
   const handlePersonaSelect = (persona: DemoPersona) => {
     setSelectedPersona(persona);
@@ -234,12 +247,49 @@ export function DemoTierModal({ isOpen, onClose }: DemoTierModalProps) {
             </div>
           </div>
 
-          {/* Tier Selection */}
+          {/* Billing Toggle & Tier Selection */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-surface-400 uppercase tracking-wider">
-                {isFamily ? 'Family Subscription Tiers' : 'Business Subscription Tiers'}
-              </h3>
+              <div className="flex items-center gap-4">
+                <h3 className="text-sm font-semibold text-surface-400 uppercase tracking-wider">
+                  {isFamily ? 'Family Subscription Tiers' : 'Business Subscription Tiers'}
+                </h3>
+
+                {/* Billing Toggle */}
+                <div className="flex items-center gap-2 bg-surface-800 rounded-full p-1">
+                  <button
+                    onClick={() => setBillingCycle('monthly')}
+                    className={cn(
+                      'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
+                      billingCycle === 'monthly'
+                        ? 'bg-brand-500 text-white'
+                        : 'text-surface-400 hover:text-white'
+                    )}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    onClick={() => setBillingCycle('annual')}
+                    className={cn(
+                      'px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1',
+                      billingCycle === 'annual'
+                        ? 'bg-green-500 text-white'
+                        : 'text-surface-400 hover:text-white'
+                    )}
+                  >
+                    Annual
+                    <span className={cn(
+                      'px-1.5 py-0.5 rounded text-[10px]',
+                      billingCycle === 'annual'
+                        ? 'bg-green-600 text-white'
+                        : 'bg-green-500/20 text-green-400'
+                    )}>
+                      -15%
+                    </span>
+                  </button>
+                </div>
+              </div>
+
               {!isFamily && (
                 <span className="flex items-center gap-2 text-xs text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-full">
                   <Tag size={14} />
@@ -252,6 +302,7 @@ export function DemoTierModal({ isOpen, onClose }: DemoTierModalProps) {
               <div className="grid grid-cols-3 gap-4">
                 {familyTiers.map((tierInfo) => {
                   const isSelected = familyTier === tierInfo.tier;
+                  const price = getPrice(tierInfo.monthlyPrice);
                   return (
                     <button
                       key={tierInfo.tier}
@@ -275,13 +326,17 @@ export function DemoTierModal({ isOpen, onClose }: DemoTierModalProps) {
                         <Crown size={20} className="absolute top-4 right-4 text-amber-400" />
                       )}
                       <p className="font-bold text-white text-lg">{tierInfo.name}</p>
-                      <div className="flex items-baseline gap-1 mb-4">
-                        <span className="text-2xl font-bold text-white">{tierInfo.price}</span>
-                        {tierInfo.priceNote && (
-                          <span className="text-sm text-surface-400">{tierInfo.priceNote}</span>
-                        )}
+                      <div className="mb-1">
+                        <span className="text-2xl font-bold text-white">{price.display}</span>
+                        <span className="text-sm text-surface-400">{price.period}</span>
                       </div>
-                      <ul className="space-y-2">
+                      {price.savings && (
+                        <p className="text-xs text-green-400 mb-2">{price.savings}</p>
+                      )}
+                      {price.total && (
+                        <p className="text-xs text-surface-500 mb-2">Billed {price.total}</p>
+                      )}
+                      <ul className="space-y-2 mt-3">
                         {tierInfo.features.map((feature, idx) => {
                           const FeatureIcon = feature.icon;
                           return (
@@ -306,6 +361,7 @@ export function DemoTierModal({ isOpen, onClose }: DemoTierModalProps) {
               <div className="grid grid-cols-3 gap-4">
                 {businessTiers.map((tierInfo) => {
                   const isSelected = businessTier === tierInfo.tier;
+                  const price = getPrice(tierInfo.monthlyPrice);
                   return (
                     <button
                       key={tierInfo.tier}
@@ -329,13 +385,17 @@ export function DemoTierModal({ isOpen, onClose }: DemoTierModalProps) {
                         <Crown size={20} className="absolute top-4 right-4 text-purple-400" />
                       )}
                       <p className="font-bold text-white text-lg">{tierInfo.name}</p>
-                      <div className="flex items-baseline gap-1 mb-4">
-                        <span className="text-2xl font-bold text-white">{tierInfo.price}</span>
-                        {tierInfo.priceNote && (
-                          <span className="text-sm text-surface-400">{tierInfo.priceNote}</span>
-                        )}
+                      <div className="mb-1">
+                        <span className="text-2xl font-bold text-white">{price.display}</span>
+                        <span className="text-sm text-surface-400">{price.period}</span>
                       </div>
-                      <ul className="space-y-2">
+                      {price.savings && (
+                        <p className="text-xs text-green-400 mb-2">{price.savings}</p>
+                      )}
+                      {price.total && (
+                        <p className="text-xs text-surface-500 mb-2">Billed {price.total}</p>
+                      )}
+                      <ul className="space-y-2 mt-3">
                         {tierInfo.features.map((feature, idx) => {
                           const FeatureIcon = feature.icon;
                           const isTagFeature = feature.text.includes('NFC/QR');
@@ -374,6 +434,7 @@ export function DemoTierModal({ isOpen, onClose }: DemoTierModalProps) {
                     ? familyTiers.find(t => t.tier === familyTier)?.name
                     : businessTiers.find(t => t.tier === businessTier)?.name
                   } Plan
+                  {isAnnual && ' (Annual)'}
                 </p>
               </div>
               <Button variant="primary" onClick={handleApply}>

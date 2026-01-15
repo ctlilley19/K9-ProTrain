@@ -47,12 +47,13 @@ Whether it's training, walking, or sitting - pet parents want **PROOF** and **PE
 25. [Technical Architecture](#technical-architecture)
 26. [Database Schema](#database-schema)
 27. [Security & Privacy](#security--privacy)
-28. [Navigation Structure](#navigation-structure)
-29. [File Structure](#file-structure)
-30. [Development Phases](#development-phases)
-31. [Business Model & Pricing](#business-model--pricing)
-32. [Anti-Gaming Protections](#anti-gaming-protections)
-33. [Glossary](#glossary)
+28. [Lost Pet Mode](#lost-pet-mode)
+29. [Navigation Structure](#navigation-structure)
+30. [File Structure](#file-structure)
+31. [Development Phases](#development-phases)
+32. [Business Model & Pricing](#business-model--pricing)
+33. [Anti-Gaming Protections](#anti-gaming-protections)
+34. [Glossary](#glossary)
 
 ---
 
@@ -1701,11 +1702,40 @@ CREATE TABLE tag_orders (
 ## Security & Privacy
 
 ### Authentication
-- Email/password with secure hashing (bcrypt)
+
+**Initial Setup (Day 1):**
+- Full login with email + password
+- Set 4-digit PIN (keeps forever, never changes)
+
+**Smart Session Management:**
+```
+Day 1:      Full login (email + password) + Set PIN
+            ↓
+Days 2-30:  Just open app → Auto-logged in
+            ↓
+Day 31:     Enter PIN (quick 4-digit)
+            ↓
+Days 32-60: Just open app → Auto-logged in
+            ↓
+Day 61:     Enter PIN
+            ↓
+Days 62-90: Just open app → Auto-logged in
+            ↓
+Day 91:     Session expired → Full login required
+            (Same PIN still works after re-login)
+```
+
+**Why This Works:**
+- Trainers stay fast: Login once, stay logged in, just tap tags
+- PIN re-verification every 30 days catches stolen devices
+- Full re-auth every 90 days ensures account security
+- PIN is permanent - set once, never changes
+
+**Additional Auth Features:**
 - OAuth: Google Sign-In
-- Session tokens (JWT) with expiration
 - Password reset via email
 - Magic links for invitations
+- Biometric unlock (Face ID / Touch ID) as PIN alternative
 
 ### Authorization
 - Role-based access control (RBAC)
@@ -1718,6 +1748,85 @@ CREATE TABLE tag_orders (
 - All elevated permission usage logged
 - Escalation notifications cannot be disabled for critical actions
 - Full audit trail for compliance
+
+---
+
+## Lost Pet Mode
+
+When a dog's tag is scanned, the system uses smart routing to show the right information to the right person.
+
+### QR/NFC Tag Scanning Flow
+
+```
+Someone scans app.k9trainpro.com/tag/ABC123
+                ↓
+         Are they logged in?
+                ↓
+        ┌───────┴───────┐
+        ↓               ↓
+       NO              YES
+        ↓               ↓
+   Lost Dog         Check Role
+    Profile             ↓
+                ┌───────┴───────┐
+                ↓               ↓
+             Trainer          Owner
+                ↓               ↓
+             Quick            Full
+              Log           Profile
+```
+
+### Lost Pet Mode Settings
+
+Pet parents can configure what strangers see when scanning their lost pet's tag:
+
+```
+Lost Pet Mode: [ON/OFF]
+
+Show to strangers:
+ ☑ Pet name
+ ☑ Pet photo
+ ☑ "I'm lost! Please help" banner
+ ☐ My phone number
+ ☑ Contact Owner button (masked email)
+ ☐ My address
+ ☑ Vet contact info
+```
+
+### Trainer Quick Log Screen
+
+When a logged-in trainer scans a dog's tag, they see a fast action screen:
+
+```
+┌─────────────────────────┐
+│  MAX (Golden Retriever) │
+│                         │
+│  [🚶 Walk]  [🍖 Feed]   │
+│                         │
+│  [🎓 Train] [💊 Meds]   │
+│                         │
+│  [📝 Note]              │
+│                         │
+│        ✓ Logged!        │
+└─────────────────────────┘
+```
+
+**Quick Log Features:**
+- One-tap activity logging
+- Auto-timestamps
+- Optional photo attachment
+- Duration timer auto-starts
+- Syncs to daily report
+
+### Owner Full Profile View
+
+When the pet owner scans, they see the complete pet profile with:
+- All activity history
+- Photo gallery
+- Training progress
+- Medical records
+- Assigned homework
+- Badge collection
 
 ---
 
