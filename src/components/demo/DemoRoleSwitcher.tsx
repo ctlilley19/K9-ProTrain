@@ -2,7 +2,16 @@
 
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAuthStore, useDemoPersona, useIsDemoMode, type DemoPersona } from '@/stores/authStore';
+import {
+  useAuthStore,
+  useDemoPersona,
+  useIsDemoMode,
+  useDemoFamilyTier,
+  useDemoBusinessTier,
+  type DemoPersona,
+  type FamilyTier,
+  type BusinessTier,
+} from '@/stores/authStore';
 import { cn } from '@/lib/utils';
 import {
   Settings2,
@@ -12,6 +21,7 @@ import {
   ChevronUp,
   X,
   Sparkles,
+  Crown,
 } from 'lucide-react';
 
 const personaConfig: Record<DemoPersona, { label: string; icon: typeof Home; color: string; path: string }> = {
@@ -35,22 +45,37 @@ const personaConfig: Record<DemoPersona, { label: string; icon: typeof Home; col
   },
 };
 
+const familyTierConfig: Record<FamilyTier, { label: string; price: string; color: string }> = {
+  free: { label: 'Free', price: '$0', color: 'surface' },
+  premium: { label: 'Premium', price: '$10/mo', color: 'brand' },
+  pro: { label: 'Pro', price: '$19/mo', color: 'amber' },
+};
+
+const businessTierConfig: Record<BusinessTier, { label: string; price: string; color: string }> = {
+  starter: { label: 'Starter', price: '$79/mo', color: 'surface' },
+  professional: { label: 'Pro', price: '$149/mo', color: 'brand' },
+  enterprise: { label: 'Business', price: '$249/mo', color: 'purple' },
+};
+
 export function DemoRoleSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
   const isDemoMode = useIsDemoMode();
   const currentPersona = useDemoPersona();
-  const { setDemoPersona } = useAuthStore();
+  const familyTier = useDemoFamilyTier();
+  const businessTier = useDemoBusinessTier();
+  const { setDemoPersona, setDemoFamilyTier, setDemoBusinessTier } = useAuthStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Only show in demo mode
   if (!isDemoMode) return null;
 
   const current = currentPersona ? personaConfig[currentPersona] : null;
+  const isFamily = currentPersona === 'dog_owner';
+  const currentTier = isFamily ? familyTierConfig[familyTier] : businessTierConfig[businessTier];
 
   const handlePersonaChange = (persona: DemoPersona) => {
     setDemoPersona(persona);
-    setIsExpanded(false);
 
     // Redirect to appropriate view
     const config = personaConfig[persona];
@@ -60,11 +85,19 @@ export function DemoRoleSwitcher() {
     }
   };
 
+  const handleFamilyTierChange = (tier: FamilyTier) => {
+    setDemoFamilyTier(tier);
+  };
+
+  const handleBusinessTierChange = (tier: BusinessTier) => {
+    setDemoBusinessTier(tier);
+  };
+
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {/* Expanded Panel */}
       {isExpanded && (
-        <div className="absolute bottom-full right-0 mb-2 w-64 bg-surface-800 border border-surface-700 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="absolute bottom-full right-0 mb-2 w-72 bg-surface-800 border border-surface-700 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
           {/* Header */}
           <div className="px-4 py-3 border-b border-surface-700 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -80,7 +113,8 @@ export function DemoRoleSwitcher() {
           </div>
 
           {/* Persona Options */}
-          <div className="p-2">
+          <div className="p-2 border-b border-surface-700">
+            <p className="text-xs text-surface-500 uppercase tracking-wider px-2 mb-2">Role</p>
             {(Object.entries(personaConfig) as [DemoPersona, typeof personaConfig[DemoPersona]][]).map(([key, config]) => {
               const isActive = currentPersona === key;
               const Icon = config.icon;
@@ -110,6 +144,68 @@ export function DemoRoleSwitcher() {
                 </button>
               );
             })}
+          </div>
+
+          {/* Tier Selection */}
+          <div className="p-2">
+            <p className="text-xs text-surface-500 uppercase tracking-wider px-2 mb-2">
+              {isFamily ? 'Family Tier' : 'Business Tier'}
+            </p>
+
+            {isFamily ? (
+              // Family Tier Options
+              <div className="grid grid-cols-3 gap-1">
+                {(Object.entries(familyTierConfig) as [FamilyTier, typeof familyTierConfig[FamilyTier]][]).map(([key, config]) => {
+                  const isActive = familyTier === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => handleFamilyTierChange(key)}
+                      className={cn(
+                        'flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors text-center',
+                        isActive
+                          ? config.color === 'amber'
+                            ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
+                            : config.color === 'brand'
+                            ? 'bg-brand-500/20 text-brand-400 ring-1 ring-brand-500/50'
+                            : 'bg-surface-600 text-white ring-1 ring-surface-500'
+                          : 'text-surface-400 hover:bg-surface-700 hover:text-surface-200'
+                      )}
+                    >
+                      {key === 'pro' && <Crown size={14} className="text-amber-400" />}
+                      <span className="text-xs font-medium">{config.label}</span>
+                      <span className="text-[10px] opacity-70">{config.price}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              // Business Tier Options
+              <div className="grid grid-cols-3 gap-1">
+                {(Object.entries(businessTierConfig) as [BusinessTier, typeof businessTierConfig[BusinessTier]][]).map(([key, config]) => {
+                  const isActive = businessTier === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => handleBusinessTierChange(key)}
+                      className={cn(
+                        'flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors text-center',
+                        isActive
+                          ? config.color === 'purple'
+                            ? 'bg-purple-500/20 text-purple-400 ring-1 ring-purple-500/50'
+                            : config.color === 'brand'
+                            ? 'bg-brand-500/20 text-brand-400 ring-1 ring-brand-500/50'
+                            : 'bg-surface-600 text-white ring-1 ring-surface-500'
+                          : 'text-surface-400 hover:bg-surface-700 hover:text-surface-200'
+                      )}
+                    >
+                      <span className="text-xs font-medium">{config.label}</span>
+                      <span className="text-[10px] opacity-70">{config.price}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Footer */}
@@ -148,6 +244,15 @@ export function DemoRoleSwitcher() {
               <current.icon size={14} />
             </div>
             <span className="text-sm font-medium text-white">{current.label}</span>
+            <span className={cn(
+              'text-xs px-1.5 py-0.5 rounded',
+              currentTier.color === 'amber' && 'bg-amber-500/20 text-amber-400',
+              currentTier.color === 'brand' && 'bg-brand-500/20 text-brand-400',
+              currentTier.color === 'purple' && 'bg-purple-500/20 text-purple-400',
+              currentTier.color === 'surface' && 'bg-surface-700 text-surface-300',
+            )}>
+              {currentTier.label}
+            </span>
           </>
         ) : (
           <>

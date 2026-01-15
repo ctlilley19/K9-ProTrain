@@ -7,6 +7,10 @@ import { isDemoMode } from '@/lib/supabase';
 // Demo Persona Types
 export type DemoPersona = 'dog_owner' | 'trainer' | 'manager';
 
+// Demo Tier Types
+export type FamilyTier = 'free' | 'premium' | 'pro';
+export type BusinessTier = 'starter' | 'professional' | 'enterprise';
+
 // Demo facility (shared across personas)
 const demoFacility: Facility = {
   id: 'demo-facility-id',
@@ -100,6 +104,8 @@ interface AuthState {
 
   // Demo Mode State
   demoPersona: DemoPersona | null;
+  demoFamilyTier: FamilyTier;
+  demoBusinessTier: BusinessTier;
   isDemoModeActive: boolean;
 
   // Actions
@@ -119,6 +125,8 @@ interface AuthState {
   // Demo Mode
   enableDemoMode: () => void;
   setDemoPersona: (persona: DemoPersona) => void;
+  setDemoFamilyTier: (tier: FamilyTier) => void;
+  setDemoBusinessTier: (tier: BusinessTier) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -132,6 +140,8 @@ export const useAuthStore = create<AuthState>()(
       isInitialized: false,
       error: null,
       demoPersona: null,
+      demoFamilyTier: 'premium',
+      demoBusinessTier: 'professional',
       isDemoModeActive: false,
 
       // Setters
@@ -354,6 +364,24 @@ export const useAuthStore = create<AuthState>()(
           isInitialized: true,
         });
       },
+
+      // Set Demo Family Tier - free, premium, pro
+      setDemoFamilyTier: (tier: FamilyTier) => {
+        set({ demoFamilyTier: tier });
+      },
+
+      // Set Demo Business Tier - starter, professional, business
+      setDemoBusinessTier: (tier: BusinessTier) => {
+        const { facility } = get();
+        if (facility) {
+          set({
+            demoBusinessTier: tier,
+            facility: { ...facility, subscription_tier: tier },
+          });
+        } else {
+          set({ demoBusinessTier: tier });
+        }
+      },
     }),
     {
       name: 'k9-trainpro-auth',
@@ -362,6 +390,8 @@ export const useAuthStore = create<AuthState>()(
         facility: state.facility,
         isAuthenticated: state.isAuthenticated,
         demoPersona: state.demoPersona,
+        demoFamilyTier: state.demoFamilyTier,
+        demoBusinessTier: state.demoBusinessTier,
         isDemoModeActive: state.isDemoModeActive,
       }),
     }
@@ -379,6 +409,8 @@ export const useUserRole = () => useAuthStore((state) => state.user?.role);
 // Demo Mode Selector Hooks
 export const useDemoPersona = () => useAuthStore((state) => state.demoPersona);
 export const useIsDemoMode = () => useAuthStore((state) => state.isDemoModeActive);
+export const useDemoFamilyTier = () => useAuthStore((state) => state.demoFamilyTier);
+export const useDemoBusinessTier = () => useAuthStore((state) => state.demoBusinessTier);
 export const useDemoFamilyId = () => {
   const persona = useAuthStore((state) => state.demoPersona);
   return persona ? demoPersonaConfigs[persona]?.familyId : null;

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Avatar } from '@/components/ui/Avatar';
 import { cn } from '@/lib/utils';
-import { useUser } from '@/stores/authStore';
+import { useUser, useDemoFamilyTier } from '@/stores/authStore';
 import {
   User,
   Users,
@@ -53,14 +53,16 @@ const sections = [
 export default function ParentSettingsPage() {
   const [activeSection, setActiveSection] = useState('account');
   const user = useUser();
+  const demoTier = useDemoFamilyTier();
 
-  // Mock subscription status
+  // Use demo tier from store
   const subscription = {
-    tier: 'premium', // 'free', 'premium', 'pro'
+    tier: demoTier,
     status: 'active',
   };
 
   const isPro = subscription.tier === 'pro';
+  const isPremiumOrPro = subscription.tier === 'premium' || subscription.tier === 'pro';
 
   return (
     <div className="max-w-4xl mx-auto">

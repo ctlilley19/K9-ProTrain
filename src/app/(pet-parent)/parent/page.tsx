@@ -7,6 +7,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { TierBadge } from '@/components/ui/Badge';
 import { formatDate } from '@/lib/utils';
 import { usePetParentDashboard } from '@/hooks';
+import { useDemoFamilyTier } from '@/stores/authStore';
 import {
   Dog,
   Calendar,
@@ -20,6 +21,9 @@ import {
   Heart,
   Sparkles,
   Loader2,
+  Crown,
+  BarChart3,
+  Lock,
 } from 'lucide-react';
 
 function ActivityIcon({ type }: { type: string }) {
@@ -37,6 +41,10 @@ function ActivityIcon({ type }: { type: string }) {
 
 export default function PetParentDashboard() {
   const { data, isLoading } = usePetParentDashboard();
+  const tier = useDemoFamilyTier();
+
+  const isPro = tier === 'pro';
+  const isPremiumOrPro = tier === 'premium' || tier === 'pro';
 
   if (isLoading || !data) {
     return (
@@ -52,18 +60,56 @@ export default function PetParentDashboard() {
   return (
     <div className="space-y-8">
       {/* Welcome Section */}
-      <div>
-        <h1 className="text-2xl font-bold text-white mb-2">
-          Welcome back, {data.family.name}!
-        </h1>
-        <p className="text-surface-400">
-          Here's how your pups are doing today.
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white mb-2">
+            Welcome back, {data.family.name}!
+          </h1>
+          <p className="text-surface-400">
+            Here's how your pups are doing today.
+          </p>
+        </div>
+        <div className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1.5 ${
+          tier === 'pro'
+            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+            : tier === 'premium'
+            ? 'bg-brand-500/20 text-brand-400 border border-brand-500/30'
+            : 'bg-surface-700 text-surface-300 border border-surface-600'
+        }`}>
+          {tier === 'pro' && <Crown size={14} />}
+          <span className="capitalize">{tier}</span>
+        </div>
       </div>
+
+      {/* Free Tier Upgrade Banner */}
+      {tier === 'free' && data.dogs.length >= 1 && (
+        <Card className="bg-gradient-to-r from-brand-500/10 to-purple-500/10 border-brand-500/20">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-brand-500/20 flex items-center justify-center">
+                  <Dog size={20} className="text-brand-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-white">Free Plan: 1 Pet Limit</p>
+                  <p className="text-sm text-surface-400">
+                    Upgrade to Premium for up to 5 pets, GPS tracking, and unlimited photos
+                  </p>
+                </div>
+              </div>
+              <Link href="/parent/settings">
+                <Button variant="primary" size="sm">
+                  Upgrade to Premium - $10/mo
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Dogs Overview */}
       <div className="grid md:grid-cols-2 gap-6">
-        {data.dogs.map((dog) => (
+        {(tier === 'free' ? data.dogs.slice(0, 1) : data.dogs).map((dog) => (
           <Card key={dog.id} className="overflow-hidden">
             {/* Dog Header with Gradient */}
             <div className="bg-gradient-to-r from-brand-500/20 to-purple-500/20 p-6">
@@ -174,6 +220,72 @@ export default function PetParentDashboard() {
         />
       </div>
 
+      {/* Pro Analytics Section */}
+      {isPro ? (
+        <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/20">
+          <CardHeader
+            title="Pet Analytics"
+            action={
+              <span className="flex items-center gap-1 text-xs text-amber-400">
+                <Crown size={14} />
+                Pro Feature
+              </span>
+            }
+          />
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div className="p-4 rounded-xl bg-surface-800/50">
+                <p className="text-2xl font-bold text-white">87%</p>
+                <p className="text-xs text-surface-500">Training Consistency</p>
+              </div>
+              <div className="p-4 rounded-xl bg-surface-800/50">
+                <p className="text-2xl font-bold text-white">12</p>
+                <p className="text-xs text-surface-500">Sessions This Week</p>
+              </div>
+              <div className="p-4 rounded-xl bg-surface-800/50">
+                <p className="text-2xl font-bold text-white">4.5</p>
+                <p className="text-xs text-surface-500">Avg Session Length</p>
+              </div>
+              <div className="p-4 rounded-xl bg-surface-800/50">
+                <p className="text-2xl font-bold text-white">+23%</p>
+                <p className="text-xs text-surface-500">Progress vs Last Month</p>
+              </div>
+            </div>
+            <div className="h-32 rounded-xl bg-surface-800/50 flex items-center justify-center">
+              <div className="text-center">
+                <BarChart3 size={32} className="mx-auto text-amber-400 mb-2" />
+                <p className="text-sm text-surface-400">Weekly training progress chart</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="bg-gradient-to-br from-surface-800 to-surface-900 border-surface-700 relative overflow-hidden">
+          <div className="absolute inset-0 bg-surface-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+            <Lock size={32} className="text-surface-600 mb-3" />
+            <h3 className="text-lg font-semibold text-white mb-1">Pet Analytics</h3>
+            <p className="text-sm text-surface-400 mb-4 text-center px-4">
+              Track training progress, consistency scores, and detailed insights
+            </p>
+            <Link href="/parent/settings">
+              <Button variant="primary" className="bg-amber-500 hover:bg-amber-400">
+                <Crown size={16} className="mr-2" />
+                Upgrade to Pro - $19/mo
+              </Button>
+            </Link>
+          </div>
+          <CardContent className="py-16 opacity-30">
+            <div className="grid grid-cols-4 gap-4">
+              <div className="p-4 rounded-xl bg-surface-800/50 h-20" />
+              <div className="p-4 rounded-xl bg-surface-800/50 h-20" />
+              <div className="p-4 rounded-xl bg-surface-800/50 h-20" />
+              <div className="p-4 rounded-xl bg-surface-800/50 h-20" />
+            </div>
+            <div className="h-32 rounded-xl bg-surface-800/50 mt-4" />
+          </CardContent>
+        </Card>
+      )}
+
       {/* Recent Reports & Photos */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Recent Reports */}
@@ -221,17 +333,21 @@ export default function PetParentDashboard() {
           <CardHeader
             title="Recent Photos"
             action={
-              <Link href="/parent/gallery">
-                <Button variant="ghost" size="sm">
-                  View All
-                  <ChevronRight size={16} className="ml-1" />
-                </Button>
-              </Link>
+              isPremiumOrPro ? (
+                <Link href="/parent/gallery">
+                  <Button variant="ghost" size="sm">
+                    View All
+                    <ChevronRight size={16} className="ml-1" />
+                  </Button>
+                </Link>
+              ) : (
+                <span className="text-xs text-surface-500">Free: 10 photos/month</span>
+              )
             }
           />
           <CardContent>
             <div className="grid grid-cols-4 gap-2">
-              {data.recent_photos.map((photo) => (
+              {(tier === 'free' ? data.recent_photos.slice(0, 4) : data.recent_photos).map((photo) => (
                 <Link
                   key={photo.id}
                   href={`/parent/gallery?photo=${photo.id}`}
@@ -251,6 +367,11 @@ export default function PetParentDashboard() {
                 </Link>
               ))}
             </div>
+            {tier === 'free' && (
+              <p className="text-xs text-surface-500 mt-3 text-center">
+                Upgrade to Premium for unlimited photos
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

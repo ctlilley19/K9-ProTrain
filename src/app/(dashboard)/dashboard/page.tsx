@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useUser, useFacility } from '@/stores/authStore';
+import { useUser, useFacility, useDemoBusinessTier } from '@/stores/authStore';
 import { useDashboardStats, useDogsWithPrograms, useTrainingBoard } from '@/hooks';
 import { PageHeader } from '@/components/layout';
-import { Card, StatCard } from '@/components/ui/Card';
+import { Card, CardContent, StatCard } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
@@ -18,6 +18,9 @@ import {
   Calendar,
   Plus,
   Loader2,
+  Crown,
+  BarChart3,
+  Lock,
 } from 'lucide-react';
 
 // Helper to get activity status label
@@ -54,9 +57,13 @@ function getActivityStatusColor(status: string): 'info' | 'success' | 'warning' 
 export default function DashboardPage() {
   const user = useUser();
   const facility = useFacility();
+  const businessTier = useDemoBusinessTier();
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: dogsWithPrograms, isLoading: dogsLoading } = useDogsWithPrograms();
   const { data: trainingBoard, isLoading: boardLoading } = useTrainingBoard();
+
+  const isProOrBusiness = businessTier === 'professional' || businessTier === 'enterprise';
+  const isBusiness = businessTier === 'enterprise';
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -123,11 +130,23 @@ export default function DashboardPage() {
         title={`${greeting()}, ${user?.name?.split(' ')[0] || 'Trainer'}!`}
         description={`Here's what's happening at ${facility?.name || 'your facility'} today`}
         action={
-          <Link href="/training">
-            <Button variant="primary" leftIcon={<Plus size={18} />}>
-              Training Board
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <div className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 ${
+              businessTier === 'enterprise'
+                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                : businessTier === 'professional'
+                ? 'bg-brand-500/20 text-brand-400 border border-brand-500/30'
+                : 'bg-surface-700 text-surface-300 border border-surface-600'
+            }`}>
+              {businessTier === 'enterprise' && <Crown size={12} />}
+              <span className="capitalize">{businessTier === 'professional' ? 'Pro' : businessTier === 'enterprise' ? 'Business' : 'Starter'}</span>
+            </div>
+            <Link href="/training">
+              <Button variant="primary" leftIcon={<Plus size={18} />}>
+                Training Board
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -151,6 +170,60 @@ export default function DashboardPage() {
           ))
         )}
       </div>
+
+      {/* Pro Analytics Section */}
+      {isProOrBusiness ? (
+        <Card className="mb-8 bg-gradient-to-br from-brand-500/10 to-purple-500/5 border-brand-500/20">
+          <CardContent>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Business Analytics</h3>
+              <span className="flex items-center gap-1 text-xs text-brand-400">
+                {isBusiness && <Crown size={12} />}
+                {isBusiness ? 'Business Feature' : 'Pro Feature'}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 rounded-xl bg-surface-800/50">
+                <p className="text-2xl font-bold text-white">92%</p>
+                <p className="text-xs text-surface-500">Client Satisfaction</p>
+              </div>
+              <div className="p-4 rounded-xl bg-surface-800/50">
+                <p className="text-2xl font-bold text-white">$12.4k</p>
+                <p className="text-xs text-surface-500">Monthly Revenue</p>
+              </div>
+              <div className="p-4 rounded-xl bg-surface-800/50">
+                <p className="text-2xl font-bold text-white">28</p>
+                <p className="text-xs text-surface-500">Graduations This Month</p>
+              </div>
+              <div className="p-4 rounded-xl bg-surface-800/50">
+                <p className="text-2xl font-bold text-white">+18%</p>
+                <p className="text-xs text-surface-500">Growth vs Last Month</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="mb-8 bg-gradient-to-br from-surface-800 to-surface-900 border-surface-700 relative overflow-hidden">
+          <div className="absolute inset-0 bg-surface-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+            <Lock size={32} className="text-surface-600 mb-3" />
+            <h3 className="text-lg font-semibold text-white mb-1">Business Analytics</h3>
+            <p className="text-sm text-surface-400 mb-4 text-center px-4">
+              Revenue tracking, client satisfaction, and growth metrics
+            </p>
+            <Button variant="primary">
+              Upgrade to Pro - $149/mo
+            </Button>
+          </div>
+          <CardContent className="py-12 opacity-30">
+            <div className="grid grid-cols-4 gap-4">
+              <div className="p-4 rounded-xl bg-surface-800/50 h-20" />
+              <div className="p-4 rounded-xl bg-surface-800/50 h-20" />
+              <div className="p-4 rounded-xl bg-surface-800/50 h-20" />
+              <div className="p-4 rounded-xl bg-surface-800/50 h-20" />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Main Content Grid */}
       <div className="grid lg:grid-cols-3 gap-6">
