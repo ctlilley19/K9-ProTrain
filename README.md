@@ -831,6 +831,44 @@ Family Pro subscribers get a digital QR code they can display on their phone scr
 - Works even without physical tag
 - Free/Premium users see "Upgrade to Pro to unlock"
 
+### QR Builder (DIY Print Option)
+
+Users can generate and print their own QR codes from within the app - no physical tag order required.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  QR BUILDER                                                      │
+│                                                                  │
+│  Select Pet: [Max - German Shepherd     ▼]                      │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                                                          │   │
+│  │              [GENERATED QR CODE]                        │   │
+│  │                                                          │   │
+│  │              app.k9trainpro.com/tap/dog/abc123          │   │
+│  │                                                          │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  Tag Style: ( ) Basic  (*) With Logo  ( ) Kennel Card          │
+│                                                                  │
+│  [ Download PNG ]  [ Download PDF ]  [ Print ]                  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Output Options:**
+- **PNG** - Single QR code image for digital use
+- **PDF** - Print-ready tag template (multiple sizes)
+- **Kennel Card** - Full card with pet photo, name, QR code
+
+**Use Cases:**
+- DIY users who want to print at home or local print shop
+- Businesses who want to laminate their own kennel cards
+- Backup tags while waiting for physical order
+- Temporary tags for boarding dogs
+
+**Note:** Physical NFC+QR tags still available for order via Tag Shop (recommended for durability and NFC tap functionality).
+
 ---
 
 ## Tag Shop & Pricing
@@ -928,6 +966,14 @@ Different pricing for Business vs Family accounts:
 | **Testing (1-25 tags)** | Tagstand (USA) | No minimums, fast |
 | **Early (50-100 tags)** | Seritag (UK) | Good quality/price |
 | **Scaling (500+ tags)** | RFIDSilicone (China) | Lowest cost |
+| **Print-on-Demand** | Printify / Gooten | For custom designs, drop-ship |
+
+**Physical Tag Reference:**
+Looking at tags similar to PetDwelling style - circular metal tag with:
+- QR code on front
+- Paw print design on back
+- NFC chip embedded
+- Split ring attachment
 
 ---
 

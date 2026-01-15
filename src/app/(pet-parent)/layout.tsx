@@ -11,29 +11,25 @@ import { DemoRoleSwitcher } from '@/components/demo/DemoRoleSwitcher';
 import {
   Dog,
   Home,
-  FileText,
-  Image,
-  Award,
   Bell,
   Settings,
   LogOut,
   Menu,
   X,
   ChevronDown,
-  BookOpen,
-  Activity,
   MessageSquare,
 } from 'lucide-react';
 
+// Consolidated navigation - 4 items
+// Dashboard: Overview, live feed, analytics (Pro)
+// Pets: Click pet → Activity, Photos, Reports, Homework inline
+// Messages: Conversations with caregivers
+// Settings: Care Team, Tags, Account, Notifications
 const navItems = [
   { href: '/parent', label: 'Dashboard', icon: Home },
-  { href: '/parent/feed', label: 'Live Feed', icon: Activity },
-  { href: '/parent/dogs', label: 'My Dogs', icon: Dog },
-  { href: '/parent/homework', label: 'Homework', icon: BookOpen },
+  { href: '/parent/dogs', label: 'Pets', icon: Dog },
   { href: '/parent/messages', label: 'Messages', icon: MessageSquare },
-  { href: '/parent/reports', label: 'Daily Reports', icon: FileText },
-  { href: '/parent/gallery', label: 'Photo Gallery', icon: Image },
-  { href: '/parent/achievements', label: 'Achievements', icon: Award },
+  { href: '/parent/settings', label: 'Settings', icon: Settings },
 ];
 
 export default function PetParentLayout({

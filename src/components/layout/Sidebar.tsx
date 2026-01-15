@@ -10,25 +10,12 @@ import {
   LayoutDashboard,
   Dog,
   Users,
-  Calendar,
-  CalendarDays,
-  Award,
-  FileText,
   Settings,
-  LogOut,
   ChevronLeft,
   ChevronRight,
   ClipboardList,
-  BarChart3,
-  Home,
-  UserCog,
-  Briefcase,
-  Target,
-  BookOpen,
-  MessageSquare,
-  Video,
-  Activity,
-  Grid3X3,
+  FolderOpen,
+  UsersRound,
 } from 'lucide-react';
 
 interface NavItem {
@@ -38,106 +25,47 @@ interface NavItem {
   roles?: string[];
 }
 
+// Consolidated navigation - 7 items for Manager, 6 for Trainer
 const navItems: NavItem[] = [
   {
     label: 'Dashboard',
     href: '/dashboard',
     icon: <LayoutDashboard size={20} />,
+    // Includes: Overview, quick stats, analytics
   },
   {
-    label: 'Training Board',
+    label: 'Board',
     href: '/training',
     icon: <ClipboardList size={20} />,
     roles: ['owner', 'admin', 'trainer'],
+    // Includes: Training Board (kanban), calendar, status feed
   },
   {
     label: 'Dogs',
     href: '/dogs',
     icon: <Dog size={20} />,
+    // Includes: Dog profiles + Kennels as view/filter
   },
   {
-    label: 'Families',
+    label: 'Clients',
     href: '/families',
     icon: <Users size={20} />,
     roles: ['owner', 'admin', 'trainer'],
+    // Includes: Client list + Messages inline
   },
   {
-    label: 'Programs',
-    href: '/programs',
-    icon: <Calendar size={20} />,
-  },
-  {
-    label: 'Calendar',
-    href: '/calendar',
-    icon: <CalendarDays size={20} />,
+    label: 'Content',
+    href: '/content',
+    icon: <FolderOpen size={20} />,
     roles: ['owner', 'admin', 'trainer'],
+    // Includes: Badges, Homework, Videos, Reports, Programs
   },
   {
-    label: 'Messages',
-    href: '/messages',
-    icon: <MessageSquare size={20} />,
-  },
-  {
-    label: 'Status Feed',
-    href: '/status-feed',
-    icon: <Activity size={20} />,
-    roles: ['owner', 'admin', 'trainer'],
-  },
-  {
-    label: 'Kennels',
-    href: '/kennels',
-    icon: <Grid3X3 size={20} />,
-    roles: ['owner', 'admin', 'trainer'],
-  },
-  {
-    label: 'Badges',
-    href: '/badges',
-    icon: <Award size={20} />,
-  },
-  {
-    label: 'Homework',
-    href: '/homework',
-    icon: <BookOpen size={20} />,
-    roles: ['owner', 'admin', 'trainer'],
-  },
-  {
-    label: 'Reports',
-    href: '/reports',
-    icon: <FileText size={20} />,
-  },
-  {
-    label: 'Videos',
-    href: '/videos',
-    icon: <Video size={20} />,
-    roles: ['owner', 'admin', 'trainer'],
-  },
-  {
-    label: 'Analytics',
-    href: '/analytics',
-    icon: <BarChart3 size={20} />,
+    label: 'Team',
+    href: '/team',
+    icon: <UsersRound size={20} />,
     roles: ['owner', 'admin'],
-  },
-];
-
-// Manager section - only visible to owners and admins
-const managerNavItems: NavItem[] = [
-  {
-    label: 'Manager',
-    href: '/manager',
-    icon: <Briefcase size={20} />,
-    roles: ['owner', 'admin'],
-  },
-  {
-    label: 'Trainers',
-    href: '/manager/trainers',
-    icon: <UserCog size={20} />,
-    roles: ['owner', 'admin'],
-  },
-  {
-    label: 'Assignments',
-    href: '/manager/assignments',
-    icon: <Target size={20} />,
-    roles: ['owner', 'admin'],
+    // Includes: Staff management, trainers, assignments
   },
 ];
 
@@ -158,12 +86,6 @@ export function Sidebar() {
   const filteredNavItems = navItems.filter(
     (item) => !item.roles || (userRole && item.roles.includes(userRole))
   );
-
-  const filteredManagerItems = managerNavItems.filter(
-    (item) => !item.roles || (userRole && item.roles.includes(userRole))
-  );
-
-  const showManagerSection = filteredManagerItems.length > 0;
 
   return (
     <aside
@@ -214,46 +136,6 @@ export function Sidebar() {
           );
         })}
 
-        {/* Manager Section */}
-        {showManagerSection && (
-          <>
-            <div className="pt-4 pb-2">
-              {!isCollapsed && (
-                <p className="px-3 text-xs font-semibold text-surface-500 uppercase tracking-wider">
-                  Management
-                </p>
-              )}
-              {isCollapsed && <div className="border-t border-surface-700 mx-2" />}
-            </div>
-            {filteredManagerItems.map((item) => {
-              // For 'Manager' item, only exact match; for sub-items, allow startsWith
-              const isActive = item.href === '/manager'
-                ? pathname === '/manager'
-                : pathname === item.href || pathname.startsWith(`${item.href}/`);
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
-                    'hover:bg-surface-800',
-                    isActive
-                      ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-                      : 'text-surface-400 hover:text-white',
-                    isCollapsed && 'justify-center'
-                  )}
-                  title={isCollapsed ? item.label : undefined}
-                >
-                  <span className={cn(isActive && 'text-purple-400')}>{item.icon}</span>
-                  {!isCollapsed && (
-                    <span className="font-medium text-sm">{item.label}</span>
-                  )}
-                </Link>
-              );
-            })}
-          </>
-        )}
       </nav>
 
       {/* Bottom Section */}
