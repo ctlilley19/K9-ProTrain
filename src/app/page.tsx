@@ -177,22 +177,21 @@ export default function LandingPage() {
           <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-brand-500/10 border border-brand-500/20 mb-4 md:mb-8">
             <Star size={14} className="text-brand-400" />
             <span className="text-xs md:text-sm text-brand-400 font-medium">
-              Built for Professional Dog Trainers
+              For Trainers & Pet Families
             </span>
           </div>
 
           <h1 className="text-3xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-6 leading-tight">
-            Stop Drowning in <br className="hidden md:block" />
-            <span className="text-gradient">Admin Work</span>
+            <span className="text-gradient">Peace of Mind</span><br className="hidden md:block" />
+            When It Matters Most
           </h1>
 
           <p className="text-base md:text-xl text-surface-400 max-w-3xl mx-auto mb-4 md:mb-6 px-2">
-            <span className="hidden md:inline">The average board & train facility spends </span>
-            <span className="text-white font-semibold">10-15 hours per week</span> on client communication<span className="hidden md:inline"> alone. That&apos;s a part-time employee&apos;s worth of hours that could be spent on training dogs</span>.
+            Whether you&apos;ve <span className="text-white font-semibold">trained dogs for 20 years</span> or <span className="text-white font-semibold">loved family dogs for 20 years</span>—K9 ProTrain connects trainers and families with real-time visibility into every dog&apos;s journey.
           </p>
 
           <p className="text-sm md:text-lg text-surface-300 max-w-2xl mx-auto mb-6 md:mb-10 hidden md:block">
-            K9 ProTrain automates the busy work so you can focus on your mission.
+            Trainers spend less time on admin. Families get daily updates. Dogs get better training.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4">
@@ -293,34 +292,66 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8 md:mb-12">
             <h2 className="text-2xl md:text-4xl font-bold text-white mb-3 md:mb-4">
-              The Trust Problem
+              We Solve the Trust Gap
             </h2>
             <p className="text-surface-400 max-w-2xl mx-auto text-sm md:text-base">
-              When pet parents drop off their dog for a 2-week board & train, they&apos;re trusting you with a family member.
+              When you drop off your dog for training, you&apos;re trusting them with a family member. When you accept that dog, you want to prove your value. K9 ProTrain bridges that gap.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
-            <div className="p-5 md:p-6 rounded-xl md:rounded-2xl bg-red-500/5 border border-red-500/20 text-center">
-              <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-3 md:mb-4">
-                <XCircle size={24} className="text-red-400" />
+          {/* Two perspectives */}
+          <div className="grid md:grid-cols-2 gap-6 mb-8 md:mb-12">
+            <div className="p-6 md:p-8 rounded-xl md:rounded-2xl bg-purple-500/5 border border-purple-500/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                  <Users size={20} className="text-purple-400" />
+                </div>
+                <h3 className="font-semibold text-white">For Pet Families</h3>
               </div>
-              <h3 className="font-semibold text-white mb-2">Silence Creates Doubt</h3>
-              <p className="text-surface-400 text-sm">Without updates, pet parents imagine the worst. Trust erodes with every silent day.</p>
+              <ul className="space-y-3 text-sm md:text-base">
+                <li className="flex items-start gap-2 text-surface-300">
+                  <CheckCircle size={16} className="text-green-400 flex-shrink-0 mt-1" />
+                  <span>Daily updates with photos and progress</span>
+                </li>
+                <li className="flex items-start gap-2 text-surface-300">
+                  <CheckCircle size={16} className="text-green-400 flex-shrink-0 mt-1" />
+                  <span>See your dog&apos;s badges and achievements</span>
+                </li>
+                <li className="flex items-start gap-2 text-surface-300">
+                  <CheckCircle size={16} className="text-green-400 flex-shrink-0 mt-1" />
+                  <span>Track homework between sessions</span>
+                </li>
+                <li className="flex items-start gap-2 text-surface-300">
+                  <CheckCircle size={16} className="text-green-400 flex-shrink-0 mt-1" />
+                  <span>Peace of mind while they&apos;re away</span>
+                </li>
+              </ul>
             </div>
-            <div className="p-5 md:p-6 rounded-xl md:rounded-2xl bg-amber-500/5 border border-amber-500/20 text-center">
-              <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-3 md:mb-4">
-                <MessageSquare size={24} className="text-amber-400" />
+            <div className="p-6 md:p-8 rounded-xl md:rounded-2xl bg-brand-500/5 border border-brand-500/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-brand-500/20 flex items-center justify-center">
+                  <Award size={20} className="text-brand-400" />
+                </div>
+                <h3 className="font-semibold text-white">For Trainers</h3>
               </div>
-              <h3 className="font-semibold text-white mb-2">Doubt Drives Interruptions</h3>
-              <p className="text-surface-400 text-sm">Anxious owners call. You stop training to reassure them. Everyone loses.</p>
-            </div>
-            <div className="p-5 md:p-6 rounded-xl md:rounded-2xl bg-green-500/5 border border-green-500/20 text-center">
-              <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-3 md:mb-4">
-                <Shield size={24} className="text-green-400" />
-              </div>
-              <h3 className="font-semibold text-white mb-2">Visibility Builds Trust</h3>
-              <p className="text-surface-400 text-sm">K9 ProTrain gives parents a window into their dog&apos;s day. Happy clients don&apos;t call.</p>
+              <ul className="space-y-3 text-sm md:text-base">
+                <li className="flex items-start gap-2 text-surface-300">
+                  <CheckCircle size={16} className="text-green-400 flex-shrink-0 mt-1" />
+                  <span>Save 10+ hours/week on admin work</span>
+                </li>
+                <li className="flex items-start gap-2 text-surface-300">
+                  <CheckCircle size={16} className="text-green-400 flex-shrink-0 mt-1" />
+                  <span>Automatic daily reports from logged activities</span>
+                </li>
+                <li className="flex items-start gap-2 text-surface-300">
+                  <CheckCircle size={16} className="text-green-400 flex-shrink-0 mt-1" />
+                  <span>Visual training board for your whole team</span>
+                </li>
+                <li className="flex items-start gap-2 text-surface-300">
+                  <CheckCircle size={16} className="text-green-400 flex-shrink-0 mt-1" />
+                  <span>Happy clients become walking referrals</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -560,10 +591,10 @@ export default function LandingPage() {
       <section className="py-20 px-4 bg-gradient-to-b from-surface-900/50 to-surface-950">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Transform Your Training Facility?
+            Ready for Peace of Mind?
           </h2>
           <p className="text-surface-400 mb-8">
-            Simple, no-pressure process. Try it with 5-10 dogs for 30 days. If it doesn&apos;t deliver, walk away.
+            Whether you&apos;re a trainer looking to save time or a family wanting visibility—start your free trial today.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
             <Link href="/register">
