@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAdminStore, useMfaSetupData, useAdmin } from '@/stores/adminStore';
+import { useAdminStore, useMfaSetupData, useAdmin, useIsAdminAuthenticated } from '@/stores/adminStore';
 import { Button } from '@/components/ui/Button';
 import { ShieldCheck, Loader2, AlertCircle, Copy, Check } from 'lucide-react';
 import QRCode from 'qrcode';
@@ -11,6 +11,7 @@ export default function MfaSetupPage() {
   const router = useRouter();
   const admin = useAdmin();
   const mfaSetupData = useMfaSetupData();
+  const isAuthenticated = useIsAdminAuthenticated();
   const { loginComplete, setError, setLoading, isLoading, error, pendingMfaSetup } = useAdminStore();
 
   const [code, setCode] = useState('');
@@ -31,12 +32,17 @@ export default function MfaSetupPage() {
     }
   }, [mfaSetupData?.qrCodeUrl]);
 
-  // Redirect if not in MFA setup flow
+  // Redirect if not in MFA setup flow (but not if already authenticated)
   useEffect(() => {
+    if (isAuthenticated) {
+      // Already authenticated, go to admin dashboard
+      router.replace('/admin');
+      return;
+    }
     if (!pendingMfaSetup || !admin) {
       router.replace('/admin/login');
     }
-  }, [pendingMfaSetup, admin, router]);
+  }, [pendingMfaSetup, admin, router, isAuthenticated]);
 
   const handleCopySecret = () => {
     if (mfaSetupData?.secret) {
