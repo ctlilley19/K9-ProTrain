@@ -165,6 +165,9 @@ export function ModalBody({ children, className }: { children: ReactNode; classN
   );
 }
 
+// Alias for backwards compatibility
+export const ModalContent = ModalBody;
+
 export function ModalFooter({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div className={cn('flex items-center justify-end gap-3 p-4 border-t border-surface-700', className)}>
