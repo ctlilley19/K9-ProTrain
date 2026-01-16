@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAdminStore, useAdmin, usePendingMfa } from '@/stores/adminStore';
+import { useAdminStore, useAdmin, usePendingMfa, useHasHydrated, useIsAdminAuthenticated } from '@/stores/adminStore';
 import { Button } from '@/components/ui/Button';
 import { ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
 
@@ -10,16 +10,24 @@ export default function MfaVerifyPage() {
   const router = useRouter();
   const admin = useAdmin();
   const pendingMfa = usePendingMfa();
+  const hasHydrated = useHasHydrated();
+  const isAuthenticated = useIsAdminAuthenticated();
   const { loginComplete, setError, setLoading, isLoading, error } = useAdminStore();
 
   const [code, setCode] = useState('');
 
-  // Redirect if not in MFA flow
+  // Redirect logic - only after hydration
   useEffect(() => {
+    if (!hasHydrated) return;
+
+    if (isAuthenticated) {
+      router.replace('/admin');
+      return;
+    }
     if (!pendingMfa || !admin) {
       router.replace('/admin/login');
     }
-  }, [pendingMfa, admin, router]);
+  }, [hasHydrated, pendingMfa, admin, router, isAuthenticated]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +72,7 @@ export default function MfaVerifyPage() {
     }
   };
 
-  if (!admin) {
+  if (!hasHydrated || !admin) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-red-500" />

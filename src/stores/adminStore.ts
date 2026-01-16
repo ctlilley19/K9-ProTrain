@@ -201,7 +201,11 @@ export const useAdminStore = create<AdminAuthState>()(
         sessionToken: state.sessionToken,
         admin: state.admin,
         isAuthenticated: state.isAuthenticated,
-        // Persist auth state to prevent redirect loops during navigation
+        pendingMfa: state.pendingMfa,
+        pendingMfaSetup: state.pendingMfaSetup,
+        pendingPasswordChange: state.pendingPasswordChange,
+        mfaSetupData: state.mfaSetupData,
+        // Persist full auth state to prevent redirect loops during navigation
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

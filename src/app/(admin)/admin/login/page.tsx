@@ -1,14 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAdminStore } from '@/stores/adminStore';
+import { useAdminStore, useHasHydrated, useIsAdminAuthenticated } from '@/stores/adminStore';
 import { Button } from '@/components/ui/Button';
 import { ShieldCheck, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const hasHydrated = useHasHydrated();
+  const isAuthenticated = useIsAdminAuthenticated();
   const { loginStart, loginComplete, setMfaSetupData, setError, setLoading, isLoading, error } = useAdminStore();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (hasHydrated && isAuthenticated) {
+      router.replace('/admin');
+    }
+  }, [hasHydrated, isAuthenticated, router]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
