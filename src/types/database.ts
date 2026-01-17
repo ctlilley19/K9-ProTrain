@@ -1361,3 +1361,31 @@ export interface KennelQRScanData {
   recent_activities: KennelActivityLog[];
   quick_actions: KennelActivityType[];
 }
+
+// ============================================================================
+// Testing Portal Types
+// ============================================================================
+
+export type TestNoteStatus = 'not_tested' | 'testing' | 'passed' | 'failed' | 'blocked';
+
+export interface TestNote {
+  id: string;
+  feature_id: string;
+  page_path: string;
+  feature_name: string;
+  category: string;
+  status: TestNoteStatus;
+  notes: string | null;
+  tested_by: string | null;
+  tested_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FeatureDefinition {
+  id: string;
+  name: string;
+  path: string;
+  category: string;
+  description?: string;
+}

@@ -1,434 +1,433 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { PageHeader } from '@/components/layout';
-import { Card, CardHeader, CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import {
   TestTube2,
-  Database,
-  Users,
-  Dog,
-  Activity,
-  Receipt,
-  Flag,
-  Bell,
-  Mail,
-  Shield,
+  Download,
+  Search,
+  Filter,
+  ChevronDown,
+  RefreshCw,
+  Trash2,
   CheckCircle2,
   XCircle,
-  Play,
-  RefreshCw,
-  Loader2,
-  ExternalLink,
-  Trash2,
-  Plus,
-  Copy,
-  Zap,
+  Clock,
+  AlertTriangle,
+  CircleDashed,
+  FileJson,
+  FileSpreadsheet,
+  FolderOpen,
+  X,
 } from 'lucide-react';
+import { TestingStats } from '@/components/admin/testing/TestingStats';
+import { FeatureRow } from '@/components/admin/testing/FeatureRow';
+import {
+  getFeaturesWithTestNotes,
+  getTestStatusCounts,
+  upsertTestNote,
+  exportTestReport,
+  exportTestReportAsCSV,
+  clearAllTestNotes,
+  type FeatureWithTestNote,
+  type TestStatusCounts,
+} from '@/services/test-notes';
+import { getAllCategories } from '@/lib/testing/features-registry';
+import type { TestNoteStatus } from '@/types/database';
 
-interface TestResult {
-  name: string;
-  status: 'pending' | 'running' | 'passed' | 'failed';
-  message?: string;
-  duration?: number;
-}
+type StatusFilter = TestNoteStatus | 'all';
 
 export default function TestingPortalPage() {
-  const [isRunningTests, setIsRunningTests] = useState(false);
-  const [testResults, setTestResults] = useState<TestResult[]>([]);
-  const [seedingStatus, setSeedingStatus] = useState<'idle' | 'seeding' | 'done' | 'error'>('idle');
+  const [features, setFeatures] = useState<FeatureWithTestNote[]>([]);
+  const [counts, setCounts] = useState<TestStatusCounts>({
+    total: 0,
+    not_tested: 0,
+    testing: 0,
+    passed: 0,
+    failed: 0,
+    blocked: 0,
+  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Quick links to all major app sections
-  const appSections = [
-    { name: 'Dashboard', href: '/dashboard', description: 'Main user dashboard' },
-    { name: 'Training Board', href: '/training', description: 'Drag & drop activity board' },
-    { name: 'Dogs', href: '/dogs', description: 'Dog profiles and management' },
-    { name: 'Family Portal', href: '/family', description: 'Parent/owner view' },
-    { name: 'Reports', href: '/reports', description: 'Daily reports generator' },
-    { name: 'Messages', href: '/messages', description: 'Communication center' },
-    { name: 'Calendar', href: '/calendar', description: 'Booking and scheduling' },
-    { name: 'Kennels', href: '/kennels', description: 'Kennel management' },
-    { name: 'Incidents', href: '/incidents', description: 'Incident reporting' },
-    { name: 'Tags/NFC', href: '/tag', description: 'NFC tag scanning' },
-    { name: 'Settings', href: '/settings', description: 'User settings' },
-  ];
+  const categories = useMemo(() => getAllCategories(), []);
 
-  const adminSections = [
-    { name: 'Admin Dashboard', href: '/admin', description: 'Admin command center' },
-    { name: 'Analytics', href: '/admin/analytics', description: 'Business analytics' },
-    { name: 'Badge Review', href: '/admin/badges', description: 'Review badge requests' },
-    { name: 'Support Tickets', href: '/admin/support', description: 'Support queue' },
-    { name: 'User Management', href: '/admin/users', description: 'Search users' },
-    { name: 'Billing', href: '/admin/billing', description: 'Revenue & payments' },
-    { name: 'Moderation', href: '/admin/moderate', description: 'Content moderation' },
-    { name: 'System Health', href: '/admin/system', description: 'System monitoring' },
-    { name: 'Audit Log', href: '/admin/audit', description: 'Activity logs' },
-    { name: 'Settings', href: '/admin/settings', description: 'System configuration' },
-  ];
+  // Load data on mount
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Simulated tests
-  const runTests = async () => {
-    setIsRunningTests(true);
-    const tests: TestResult[] = [
-      { name: 'Database Connection', status: 'pending' },
-      { name: 'Auth Service', status: 'pending' },
-      { name: 'Storage Service', status: 'pending' },
-      { name: 'API Routes', status: 'pending' },
-      { name: 'Email Service', status: 'pending' },
-      { name: 'Feature Flags', status: 'pending' },
-    ];
-    setTestResults(tests);
+  const loadData = useCallback(() => {
+    setIsLoading(true);
+    const featuresData = getFeaturesWithTestNotes();
+    const countsData = getTestStatusCounts();
+    setFeatures(featuresData);
+    setCounts(countsData);
+    // Expand all categories by default
+    setExpandedCategories(new Set(getAllCategories()));
+    setIsLoading(false);
+  }, []);
 
-    for (let i = 0; i < tests.length; i++) {
-      setTestResults((prev) =>
-        prev.map((t, idx) => (idx === i ? { ...t, status: 'running' } : t))
-      );
+  // Handle status change
+  const handleStatusChange = useCallback((featureId: string, status: TestNoteStatus) => {
+    upsertTestNote(featureId, { status, tested_by: 'Admin' });
+    // Reload data
+    setFeatures(getFeaturesWithTestNotes());
+    setCounts(getTestStatusCounts());
+  }, []);
 
-      await new Promise((resolve) => setTimeout(resolve, 500 + Math.random() * 500));
+  // Handle notes change
+  const handleNotesChange = useCallback((featureId: string, notes: string) => {
+    upsertTestNote(featureId, { notes });
+    // Don't reload all data for notes, just update locally
+    setFeatures(prev =>
+      prev.map(f =>
+        f.id === featureId
+          ? {
+              ...f,
+              testNote: f.testNote
+                ? { ...f.testNote, notes }
+                : null,
+            }
+          : f
+      )
+    );
+  }, []);
 
-      const passed = Math.random() > 0.1; // 90% pass rate for demo
-      setTestResults((prev) =>
-        prev.map((t, idx) =>
-          idx === i
-            ? {
-                ...t,
-                status: passed ? 'passed' : 'failed',
-                message: passed ? 'OK' : 'Connection timeout',
-                duration: Math.round(50 + Math.random() * 200),
-              }
-            : t
-        )
-      );
+  // Filter features
+  const filteredFeatures = useMemo(() => {
+    return features.filter(f => {
+      // Status filter
+      if (statusFilter !== 'all') {
+        const featureStatus = f.testNote?.status || 'not_tested';
+        if (featureStatus !== statusFilter) return false;
+      }
+
+      // Category filter
+      if (categoryFilter !== 'all' && f.category !== categoryFilter) {
+        return false;
+      }
+
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        return (
+          f.name.toLowerCase().includes(query) ||
+          f.path.toLowerCase().includes(query) ||
+          f.category.toLowerCase().includes(query) ||
+          f.description?.toLowerCase().includes(query)
+        );
+      }
+
+      return true;
+    });
+  }, [features, statusFilter, categoryFilter, searchQuery]);
+
+  // Group filtered features by category
+  const groupedFeatures = useMemo(() => {
+    const grouped: Record<string, FeatureWithTestNote[]> = {};
+    for (const feature of filteredFeatures) {
+      if (!grouped[feature.category]) {
+        grouped[feature.category] = [];
+      }
+      grouped[feature.category].push(feature);
     }
+    return grouped;
+  }, [filteredFeatures]);
 
-    setIsRunningTests(false);
+  // Toggle category expansion
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
   };
 
-  // Seed demo data
-  const seedDemoData = async () => {
-    setSeedingStatus('seeding');
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setSeedingStatus('done');
+  // Expand/collapse all
+  const expandAll = () => setExpandedCategories(new Set(categories));
+  const collapseAll = () => setExpandedCategories(new Set());
+
+  // Export handlers
+  const handleExportJSON = () => {
+    const report = exportTestReport();
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `test-report-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowExportMenu(false);
   };
 
-  // Copy test credentials
-  const copyCredentials = () => {
-    const creds = `Admin Portal Test Credentials
-------------------------------
-Email: ct.lilley19@gmail.com
-Password: TestAdmin2025!
-
-Demo Mode (No login required):
-Visit any page with demo=true query param`;
-    navigator.clipboard.writeText(creds);
+  const handleExportCSV = () => {
+    const csv = exportTestReportAsCSV();
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `test-report-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowExportMenu(false);
   };
+
+  // Reset all tests
+  const handleResetAll = () => {
+    if (confirm('Are you sure you want to reset all test results? This cannot be undone.')) {
+      clearAllTestNotes();
+      loadData();
+    }
+  };
+
+  const statusFilterOptions: { value: StatusFilter; label: string; icon: React.ReactNode }[] = [
+    { value: 'all', label: 'All Statuses', icon: <Filter size={14} /> },
+    { value: 'not_tested', label: 'Not Tested', icon: <CircleDashed size={14} /> },
+    { value: 'testing', label: 'Testing', icon: <Clock size={14} /> },
+    { value: 'passed', label: 'Passed', icon: <CheckCircle2 size={14} /> },
+    { value: 'failed', label: 'Failed', icon: <XCircle size={14} /> },
+    { value: 'blocked', label: 'Blocked', icon: <AlertTriangle size={14} /> },
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <RefreshCw className="w-8 h-8 animate-spin text-brand-500" />
+      </div>
+    );
+  }
 
   return (
     <div>
       <PageHeader
         title="Testing Portal"
-        description="Quality assurance and testing tools for K9 ProTrain"
+        description="QA testing tracker for all features across K9 ProTrain"
         action={
-          <Button variant="primary" leftIcon={<Play size={16} />} onClick={runTests} disabled={isRunningTests}>
-            Run All Tests
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" leftIcon={<RefreshCw size={14} />} onClick={loadData}>
+              Refresh
+            </Button>
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                leftIcon={<Download size={14} />}
+                rightIcon={<ChevronDown size={14} />}
+                onClick={() => setShowExportMenu(!showExportMenu)}
+              >
+                Export
+              </Button>
+              {showExportMenu && (
+                <div className="absolute right-0 mt-1 w-48 bg-surface-800 border border-surface-600 rounded-lg shadow-xl z-10">
+                  <button
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-white hover:bg-surface-700 transition-colors rounded-t-lg"
+                    onClick={handleExportJSON}
+                  >
+                    <FileJson size={16} className="text-blue-400" />
+                    Export as JSON
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-white hover:bg-surface-700 transition-colors rounded-b-lg"
+                    onClick={handleExportCSV}
+                  >
+                    <FileSpreadsheet size={16} className="text-green-400" />
+                    Export as CSV
+                  </button>
+                </div>
+              )}
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<Trash2 size={14} />}
+              onClick={handleResetAll}
+              className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+            >
+              Reset All
+            </Button>
+          </div>
         }
       />
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Quick Tests */}
-        <Card>
-          <CardHeader
-            title="System Tests"
-            action={
-              isRunningTests ? (
-                <Loader2 size={16} className="animate-spin text-brand-500" />
-              ) : testResults.length > 0 ? (
-                <span className="text-sm text-surface-400">
-                  {testResults.filter((t) => t.status === 'passed').length}/{testResults.length} passed
-                </span>
-              ) : null
-            }
-          />
-          <CardContent>
-            {testResults.length === 0 ? (
-              <div className="text-center py-8 text-surface-400">
-                <TestTube2 size={48} className="mx-auto mb-3 opacity-50" />
-                <p>Click "Run All Tests" to check system health</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {testResults.map((test) => (
-                  <div
-                    key={test.name}
-                    className="flex items-center justify-between p-3 rounded-lg bg-surface-800"
+      {/* Stats Section */}
+      <div className="mb-6">
+        <TestingStats counts={counts} />
+      </div>
+
+      {/* Filters */}
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1">
+              <div className="relative">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400" />
+                <input
+                  type="text"
+                  placeholder="Search features..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-surface-800 border border-surface-600 rounded-lg text-white text-sm placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                />
+                {searchQuery && (
+                  <button
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white"
+                    onClick={() => setSearchQuery('')}
                   >
-                    <div className="flex items-center gap-3">
-                      {test.status === 'pending' && (
-                        <div className="w-5 h-5 rounded-full border-2 border-surface-600" />
-                      )}
-                      {test.status === 'running' && (
-                        <Loader2 size={20} className="animate-spin text-brand-500" />
-                      )}
-                      {test.status === 'passed' && (
-                        <CheckCircle2 size={20} className="text-green-500" />
-                      )}
-                      {test.status === 'failed' && <XCircle size={20} className="text-red-500" />}
-                      <span className="text-white">{test.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      {test.message && (
-                        <span
-                          className={test.status === 'passed' ? 'text-green-400' : 'text-red-400'}
-                        >
-                          {test.message}
-                        </span>
-                      )}
-                      {test.duration && (
-                        <span className="text-surface-500">{test.duration}ms</span>
-                      )}
-                    </div>
-                  </div>
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Status Filter */}
+            <div className="sm:w-48">
+              <select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value as StatusFilter)}
+                className="w-full px-3 py-2 bg-surface-800 border border-surface-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+              >
+                {statusFilterOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
                 ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              </select>
+            </div>
 
-        {/* Test Credentials */}
-        <Card>
-          <CardHeader title="Test Credentials" />
-          <CardContent className="space-y-4">
-            <div className="p-4 rounded-lg bg-surface-800 font-mono text-sm">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-surface-400"># Admin Portal</p>
-                  <p className="text-white">Email: ct.lilley19@gmail.com</p>
-                  <p className="text-white">Password: TestAdmin2025!</p>
-                  <p className="text-surface-500 mt-2"># First login requires MFA setup</p>
+            {/* Category Filter */}
+            <div className="sm:w-56">
+              <select
+                value={categoryFilter}
+                onChange={e => setCategoryFilter(e.target.value)}
+                className="w-full px-3 py-2 bg-surface-800 border border-surface-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+              >
+                <option value="all">All Categories</option>
+                {categories.map(category => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Expand/Collapse Buttons */}
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={expandAll}>
+                Expand All
+              </Button>
+              <Button variant="ghost" size="sm" onClick={collapseAll}>
+                Collapse
+              </Button>
+            </div>
+          </div>
+
+          {/* Active Filters */}
+          {(statusFilter !== 'all' || categoryFilter !== 'all' || searchQuery) && (
+            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-surface-700">
+              <span className="text-xs text-surface-400">Filters:</span>
+              {statusFilter !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-surface-700 rounded text-xs text-surface-300">
+                  Status: {statusFilter}
+                  <button onClick={() => setStatusFilter('all')}>
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+              {categoryFilter !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-surface-700 rounded text-xs text-surface-300">
+                  {categoryFilter}
+                  <button onClick={() => setCategoryFilter('all')}>
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+              {searchQuery && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-surface-700 rounded text-xs text-surface-300">
+                  &quot;{searchQuery}&quot;
+                  <button onClick={() => setSearchQuery('')}>
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+              <button
+                className="text-xs text-brand-400 hover:text-brand-300"
+                onClick={() => {
+                  setStatusFilter('all');
+                  setCategoryFilter('all');
+                  setSearchQuery('');
+                }}
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Results Summary */}
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-surface-400">
+          Showing {filteredFeatures.length} of {features.length} features
+        </p>
+      </div>
+
+      {/* Features List by Category */}
+      <div className="space-y-4">
+        {Object.entries(groupedFeatures).length === 0 ? (
+          <Card className="p-8 text-center">
+            <TestTube2 size={48} className="mx-auto mb-3 text-surface-500" />
+            <p className="text-surface-400">No features match your filters</p>
+          </Card>
+        ) : (
+          Object.entries(groupedFeatures).map(([category, categoryFeatures]) => (
+            <Card key={category} padding="none">
+              {/* Category Header */}
+              <button
+                className="w-full flex items-center justify-between p-4 text-left hover:bg-surface-800/50 transition-colors rounded-t-xl"
+                onClick={() => toggleCategory(category)}
+              >
+                <div className="flex items-center gap-3">
+                  <FolderOpen size={18} className="text-brand-400" />
+                  <span className="font-semibold text-white">{category}</span>
+                  <span className="text-sm text-surface-400">({categoryFeatures.length})</span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={copyCredentials}>
-                  <Copy size={14} />
-                </Button>
-              </div>
-            </div>
+                <ChevronDown
+                  size={18}
+                  className={`text-surface-400 transition-transform ${
+                    expandedCategories.has(category) ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
 
-            <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
-              <div className="flex items-center gap-2 text-blue-400 mb-2">
-                <Zap size={16} />
-                <span className="font-medium">Demo Mode</span>
-              </div>
-              <p className="text-sm text-surface-300">
-                The app runs in demo mode by default with pre-populated test data.
-                No real database connection required for testing the UI.
-              </p>
-            </div>
-
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={seedDemoData}
-              disabled={seedingStatus === 'seeding'}
-              leftIcon={
-                seedingStatus === 'seeding' ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : seedingStatus === 'done' ? (
-                  <CheckCircle2 size={16} />
-                ) : (
-                  <Database size={16} />
-                )
-              }
-            >
-              {seedingStatus === 'seeding'
-                ? 'Seeding Data...'
-                : seedingStatus === 'done'
-                  ? 'Demo Data Ready!'
-                  : 'Seed Demo Data'}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* App Sections */}
-        <Card>
-          <CardHeader title="User App Sections" />
-          <CardContent>
-            <div className="grid grid-cols-2 gap-2">
-              {appSections.map((section) => (
-                <a
-                  key={section.href}
-                  href={section.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 rounded-lg bg-surface-800 hover:bg-surface-700 transition-colors group"
-                >
-                  <div>
-                    <p className="text-white font-medium">{section.name}</p>
-                    <p className="text-xs text-surface-400">{section.description}</p>
-                  </div>
-                  <ExternalLink
-                    size={14}
-                    className="text-surface-500 group-hover:text-brand-500 transition-colors"
-                  />
-                </a>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Admin Sections */}
-        <Card>
-          <CardHeader title="Admin Sections" />
-          <CardContent>
-            <div className="grid grid-cols-2 gap-2">
-              {adminSections.map((section) => (
-                <a
-                  key={section.href}
-                  href={section.href}
-                  className="flex items-center justify-between p-3 rounded-lg bg-surface-800 hover:bg-surface-700 transition-colors group"
-                >
-                  <div>
-                    <p className="text-white font-medium">{section.name}</p>
-                    <p className="text-xs text-surface-400">{section.description}</p>
-                  </div>
-                  <ExternalLink
-                    size={14}
-                    className="text-surface-500 group-hover:text-red-500 transition-colors"
-                  />
-                </a>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Feature Checklist */}
-        <Card className="lg:col-span-2">
-          <CardHeader title="Feature Checklist" />
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div>
-                <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                  <Users size={16} />
-                  User Features
-                </h4>
-                <ul className="space-y-2">
-                  {[
-                    'User Registration & Login',
-                    'Dog Profile Management',
-                    'Activity Tracking',
-                    'Daily Reports',
-                    'Photo/Video Uploads',
-                    'Family Portal Access',
-                    'NFC Tag Scanning',
-                    'Messaging System',
-                    'Calendar & Booking',
-                    'Incident Reporting',
-                    'Badge Requests',
-                    'Subscription Management',
-                  ].map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm">
-                      <CheckCircle2 size={14} className="text-green-500" />
-                      <span className="text-surface-300">{feature}</span>
-                    </li>
+              {/* Category Features */}
+              {expandedCategories.has(category) && (
+                <div className="border-t border-surface-700/50 p-3 space-y-2">
+                  {categoryFeatures.map(feature => (
+                    <FeatureRow
+                      key={feature.id}
+                      feature={feature}
+                      onStatusChange={handleStatusChange}
+                      onNotesChange={handleNotesChange}
+                    />
                   ))}
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                  <Dog size={16} />
-                  Trainer Features
-                </h4>
-                <ul className="space-y-2">
-                  {[
-                    'Training Board (Drag & Drop)',
-                    'Quick Activity Logging',
-                    'Photo Capture & Notes',
-                    'Report Generation',
-                    'Kennel Management',
-                    'Custom Activity Types',
-                    'Client Communication',
-                    'Schedule Management',
-                  ].map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm">
-                      <CheckCircle2 size={14} className="text-green-500" />
-                      <span className="text-surface-300">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                  <Shield size={16} />
-                  Admin Features
-                </h4>
-                <ul className="space-y-2">
-                  {[
-                    'Command Dashboard',
-                    'Analytics & Metrics',
-                    'Badge Review System',
-                    'Support Ticket Queue',
-                    'User Search (Audited)',
-                    'Billing Management',
-                    'Content Moderation',
-                    'System Health Monitor',
-                    'Audit Log Viewer',
-                    'Feature Flags',
-                    'MFA Authentication',
-                    'Role-Based Access',
-                  ].map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm">
-                      <CheckCircle2 size={14} className="text-green-500" />
-                      <span className="text-surface-300">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* API Status */}
-        <Card className="lg:col-span-2">
-          <CardHeader title="API Endpoints" />
-          <CardContent>
-            <div className="grid md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <h5 className="text-surface-400 mb-2">Authentication</h5>
-                <ul className="space-y-1 font-mono text-xs">
-                  <li className="text-green-400">POST /api/auth/login</li>
-                  <li className="text-green-400">POST /api/auth/signup</li>
-                  <li className="text-green-400">POST /api/auth/logout</li>
-                </ul>
-              </div>
-              <div>
-                <h5 className="text-surface-400 mb-2">Activities</h5>
-                <ul className="space-y-1 font-mono text-xs">
-                  <li className="text-green-400">GET /api/activities</li>
-                  <li className="text-green-400">POST /api/activities</li>
-                  <li className="text-green-400">PATCH /api/activities/:id</li>
-                </ul>
-              </div>
-              <div>
-                <h5 className="text-surface-400 mb-2">Admin</h5>
-                <ul className="space-y-1 font-mono text-xs">
-                  <li className="text-green-400">GET /api/admin/analytics</li>
-                  <li className="text-green-400">POST /api/admin/badges</li>
-                  <li className="text-green-400">GET /api/admin/audit</li>
-                  <li className="text-green-400">POST /api/admin/settings</li>
-                </ul>
-              </div>
-              <div>
-                <h5 className="text-surface-400 mb-2">Webhooks</h5>
-                <ul className="space-y-1 font-mono text-xs">
-                  <li className="text-green-400">POST /api/webhooks/stripe</li>
-                  <li className="text-green-400">POST /api/webhooks/tag-scan</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                </div>
+              )}
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );
