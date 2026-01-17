@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create billing portal session
-    const session = await stripe.billingPortal.sessions.create({
+    const session = await getStripe().billingPortal.sessions.create({
       customer: facility.stripe_customer_id,
       return_url: returnUrl || `${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=billing`,
     });

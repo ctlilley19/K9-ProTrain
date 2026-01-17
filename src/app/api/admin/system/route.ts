@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
       id: alert.id,
       type: alert.action.includes('error') || alert.action.includes('fail') ? 'error' :
             alert.action.includes('warn') ? 'warning' : 'info',
-      title: alert.action.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      title: alert.action.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
       description: alert.reason || '',
       time: alert.created_at,
     }));

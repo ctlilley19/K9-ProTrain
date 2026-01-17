@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -109,9 +110,9 @@ export default function NewDogPage() {
                 />
                 <p className="text-xs text-surface-500 mt-2">
                   Need to add a new family?{' '}
-                  <a href="/families/new" className="text-brand-400 hover:underline">
+                  <Link href="/families/new" className="text-brand-400 hover:underline">
                     Create one here
-                  </a>
+                  </Link>
                 </p>
               </CardContent>
             </Card>

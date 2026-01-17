@@ -10,7 +10,7 @@ export function getStripe(): Stripe {
       throw new Error('STRIPE_SECRET_KEY not configured');
     }
     stripeClient = new Stripe(key, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2025-12-15.clover',
       typescript: true,
     });
   }
@@ -125,8 +125,8 @@ export const SUBSCRIPTION_TIERS = {
   enterprise: {
     name: 'Business Enterprise',
     type: 'business' as const,
-    monthlyPrice: 19900, // $199.00
-    annualPrice: 203000, // $2030/year (15% discount)
+    monthlyPrice: 24900, // $249.00
+    annualPrice: 249000, // $2490/year (2 months free)
     stripePriceIdMonthly: process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY,
     stripePriceIdAnnual: process.env.STRIPE_PRICE_ENTERPRISE_ANNUAL,
     features: [

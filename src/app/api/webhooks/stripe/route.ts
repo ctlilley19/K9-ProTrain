@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-import { stripe, SUBSCRIPTION_TIERS } from '@/lib/stripe';
+import { getStripe, SUBSCRIPTION_TIERS } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { sendVendorOrderEmail, sendOrderConfirmationEmail } from '@/services/email/vendor-order';
 
@@ -36,7 +36,8 @@ function getTierFromPriceId(priceId: string): string {
 // Get free tags allowance for tier
 function getFreeTags(tier: string): number {
   const config = SUBSCRIPTION_TIERS[tier as keyof typeof SUBSCRIPTION_TIERS];
-  return config?.limits?.freeTags || 0;
+  const limits = config?.limits as { freeTags?: number } | undefined;
+  return limits?.freeTags || 0;
 }
 
 export async function POST(request: NextRequest) {
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = getStripe().webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
     console.error('Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -157,7 +158,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
   // Handle subscription checkout
   if (session.subscription) {
-    const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+    const subscription = await getStripe().subscriptions.retrieve(session.subscription as string);
     await handleSubscriptionChange(subscription, 'customer.subscription.created');
   }
 }
@@ -203,6 +204,13 @@ async function handleTagOrderPayment(orderId: string, session: Stripe.Checkout.S
 async function handleSubscriptionChange(subscription: Stripe.Subscription, eventType: string) {
   const supabaseAdmin = getSupabaseAdmin();
   const facilityId = subscription.metadata?.facility_id;
+  // Cast to access period fields that may vary by API version
+  const sub = subscription as Stripe.Subscription & {
+    current_period_start?: number;
+    current_period_end?: number;
+    trial_start?: number | null;
+    trial_end?: number | null;
+  };
 
   if (!facilityId) {
     // Try to find facility by customer ID
@@ -229,15 +237,15 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription, event
     subscription_tier: tier,
     subscription_status: status,
     billing_interval: interval,
-    current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-    current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+    current_period_start: sub.current_period_start ? new Date(sub.current_period_start * 1000).toISOString() : null,
+    current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
     cancel_at_period_end: subscription.cancel_at_period_end,
     free_tags_allowance: getFreeTags(tier),
     updated_at: new Date().toISOString(),
   };
 
-  if (subscription.trial_end) {
-    updateData.trial_ends_at = new Date(subscription.trial_end * 1000).toISOString();
+  if (sub.trial_end) {
+    updateData.trial_ends_at = new Date(sub.trial_end * 1000).toISOString();
   }
 
   // Find facility by customer ID if not in metadata
@@ -255,11 +263,11 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription, event
     tier,
     status,
     billing_interval: interval,
-    current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-    current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+    current_period_start: sub.current_period_start ? new Date(sub.current_period_start * 1000).toISOString() : null,
+    current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
     cancel_at_period_end: subscription.cancel_at_period_end,
-    trial_start: subscription.trial_start ? new Date(subscription.trial_start * 1000).toISOString() : null,
-    trial_end: subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null,
+    trial_start: sub.trial_start ? new Date(sub.trial_start * 1000).toISOString() : null,
+    trial_end: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
   }, {
     onConflict: 'stripe_subscription_id',
   });
@@ -297,7 +305,21 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
-  if (!invoice.subscription) return;
+  // Cast to access fields that may vary by API version
+  const inv = invoice as Stripe.Invoice & {
+    subscription?: string | null;
+    payment_intent?: string | null;
+    hosted_invoice_url?: string | null;
+    invoice_pdf?: string | null;
+    tax?: number | null;
+    amount_paid?: number;
+    amount_due?: number;
+    status_transitions?: { paid_at?: number | null };
+    customer_name?: string | null;
+    customer_email?: string | null;
+  };
+
+  if (!inv.subscription) return;
 
   const supabaseAdmin = getSupabaseAdmin();
   const { data: facility } = await supabaseAdmin
@@ -312,32 +334,32 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   await supabaseAdmin.from('invoices').upsert({
     stripe_invoice_id: invoice.id,
     facility_id: facility.id,
-    stripe_payment_intent_id: invoice.payment_intent as string,
-    stripe_hosted_invoice_url: invoice.hosted_invoice_url,
-    stripe_invoice_pdf: invoice.invoice_pdf,
+    stripe_payment_intent_id: inv.payment_intent || null,
+    stripe_hosted_invoice_url: inv.hosted_invoice_url || null,
+    stripe_invoice_pdf: inv.invoice_pdf || null,
     invoice_number: invoice.number,
     status: 'paid',
     currency: invoice.currency,
     subtotal: invoice.subtotal,
-    tax: invoice.tax || 0,
+    tax: inv.tax || 0,
     total: invoice.total,
-    amount_paid: invoice.amount_paid,
-    amount_due: invoice.amount_due,
+    amount_paid: inv.amount_paid || 0,
+    amount_due: inv.amount_due || 0,
     invoice_date: new Date(invoice.created * 1000).toISOString().split('T')[0],
-    paid_at: invoice.status_transitions?.paid_at
-      ? new Date(invoice.status_transitions.paid_at * 1000).toISOString()
+    paid_at: inv.status_transitions?.paid_at
+      ? new Date(inv.status_transitions.paid_at * 1000).toISOString()
       : new Date().toISOString(),
-    customer_name: invoice.customer_name,
-    customer_email: invoice.customer_email,
+    customer_name: inv.customer_name || null,
+    customer_email: inv.customer_email || null,
   }, {
     onConflict: 'stripe_invoice_id',
   });
 
   // Record payment
-  if (invoice.payment_intent) {
-    const paymentIntent = await stripe.paymentIntents.retrieve(invoice.payment_intent as string);
+  if (inv.payment_intent) {
+    const paymentIntent = await getStripe().paymentIntents.retrieve(inv.payment_intent);
     const charge = paymentIntent.latest_charge
-      ? await stripe.charges.retrieve(paymentIntent.latest_charge as string)
+      ? await getStripe().charges.retrieve(paymentIntent.latest_charge as string)
       : null;
 
     await supabaseAdmin.from('payments').upsert({

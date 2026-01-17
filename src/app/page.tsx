@@ -67,7 +67,7 @@ const stayTrainFeatures = [
   {
     icon: <Smartphone size={20} />,
     title: 'Pet Parent Portal',
-    description: 'Owners see live status, photos, progress, and earned badges. Eliminates 80%+ of calls.',
+    description: 'Owners see live status, photos, progress, and earned badges. Dramatically reduces routine check-in calls.',
   },
   {
     icon: <Camera size={20} />,

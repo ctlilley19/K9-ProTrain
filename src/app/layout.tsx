@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Providers } from './providers';
+import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -18,6 +19,12 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'Lazy E Holdings LLC' }],
   creator: 'Lazy E Holdings LLC',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'K9 ProTrain',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -36,13 +43,22 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: [
+      { url: '/icons/icon.svg', type: 'image/svg+xml' },
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#f59e0b',
+  themeColor: '#3b82f6',
 };
 
 export default function RootLayout({
@@ -54,6 +70,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="min-h-screen bg-surface-950 text-white antialiased">
         <Providers>{children}</Providers>
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );

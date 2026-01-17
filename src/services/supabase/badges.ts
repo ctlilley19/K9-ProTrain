@@ -136,7 +136,7 @@ export type BadgeDefinitionKey = keyof typeof badgeDefinitions;
 export const badgesService = {
   // Get all badges for a dog
   async getByDog(dogId: string): Promise<Badge[]> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       return mockBadges.filter((b) => b.dog_id === dogId);
     }
 
@@ -152,7 +152,7 @@ export const badgesService = {
 
   // Get all badges for a facility
   async getByFacility(facilityId: string): Promise<Badge[]> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       return mockBadges;
     }
 
@@ -186,7 +186,7 @@ export const badgesService = {
       throw new Error(`Invalid tier ${tier} for badge ${badgeKey}`);
     }
 
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const newBadge: Badge = {
         id: crypto.randomUUID(),
         dog_id: dogId,
@@ -221,7 +221,7 @@ export const badgesService = {
 
   // Upgrade an existing badge to a higher tier
   async upgrade(badgeId: string, newTier: BadgeTier, notes?: string): Promise<Badge> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const badge = mockBadges.find((b) => b.id === badgeId);
       if (badge) {
         badge.tier = newTier;
@@ -248,7 +248,7 @@ export const badgesService = {
 
   // Remove a badge
   async remove(badgeId: string): Promise<void> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const index = mockBadges.findIndex((b) => b.id === badgeId);
       if (index > -1) mockBadges.splice(index, 1);
       return;
@@ -282,7 +282,7 @@ export const badgesService = {
     const byCategory: Record<string, number> = {};
 
     badges.forEach((badge) => {
-      byTier[badge.tier]++;
+      if (badge.tier) byTier[badge.tier]++;
 
       const definition = badgeDefinitions[badge.badge_type as BadgeDefinitionKey];
       if (definition) {

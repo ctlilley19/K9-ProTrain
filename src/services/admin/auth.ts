@@ -4,12 +4,9 @@
  */
 
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
-import { TOTP, generateSecret, generateURI, verify } from 'otplib';
+import { verify as totpVerify, generateSecret, generateURI } from 'otplib';
 import bcrypt from 'bcryptjs';
 import { SupabaseClient } from '@supabase/supabase-js';
-
-// Create TOTP instance
-const totp = new TOTP();
 
 // Types
 export type AdminRole = 'super_admin' | 'support' | 'moderator' | 'analytics' | 'billing';
@@ -166,7 +163,7 @@ export async function verifyMfa(
     }
 
     // Verify TOTP code
-    const isValid = totp.verify({ token: code, secret: admin.mfa_secret });
+    const isValid = totpVerify({ token: code, secret: admin.mfa_secret });
 
     if (!isValid) {
       // Check backup codes
@@ -198,7 +195,7 @@ export async function verifyMfa(
       requiresPasswordChange: admin.must_change_password,
       requiresMfaSetup: false,
       admin: transformAdmin(admin),
-      sessionToken: session.session_token,
+      sessionToken: session.sessionToken,
     };
   } catch (error) {
     console.error('MFA verification error:', error);
@@ -232,9 +229,6 @@ export async function setupMfa(adminId: string): Promise<MfaSetupResult> {
       issuer: 'K9 ProTrain Admin',
       label: admin.email,
       secret,
-      algorithm: 'SHA1',
-      digits: 6,
-      period: 30,
     });
 
     // Store secret (not yet enabled)
@@ -275,7 +269,7 @@ export async function completeMfaSetup(
     }
 
     // Verify code
-    const isValid = totp.verify({ token: code, secret: admin.mfa_secret });
+    const isValid = totpVerify({ token: code, secret: admin.mfa_secret });
 
     if (!isValid) {
       return { success: false, requiresMfa: false, requiresPasswordChange: false, requiresMfaSetup: true, error: 'Invalid verification code' };
@@ -304,7 +298,7 @@ export async function completeMfaSetup(
       requiresPasswordChange: admin.must_change_password,
       requiresMfaSetup: false,
       admin: transformAdmin({ ...admin, mfa_enabled: true }),
-      sessionToken: session.session_token,
+      sessionToken: session.sessionToken,
     };
   } catch (error) {
     console.error('MFA completion error:', error);

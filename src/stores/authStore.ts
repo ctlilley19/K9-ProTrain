@@ -26,6 +26,8 @@ const demoFacility: Facility = {
   timezone: 'America/New_York',
   subscription_tier: 'professional',
   stripe_customer_id: null,
+  free_tags_allowance: 10,
+  free_tags_used: 0,
   settings: {
     kennel_max_minutes: 240,
     potty_interval_minutes: 120,

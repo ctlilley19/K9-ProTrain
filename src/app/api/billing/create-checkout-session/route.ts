@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe, SUBSCRIPTION_TIERS, type SubscriptionTier } from '@/lib/stripe';
+import { getStripe, SUBSCRIPTION_TIERS, type SubscriptionTier } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 // Create admin Supabase client for server-side operations
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     let customerId = facility.stripe_customer_id;
 
     if (!customerId) {
-      const customer = await stripe.customers.create({
+      const customer = await getStripe().customers.create({
         email: facility.email,
         name: facility.name,
         metadata: {
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create checkout session
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],

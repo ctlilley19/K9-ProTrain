@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Shield, Check, X, AlertCircle } from 'lucide-react';
-import { setPin } from '@/services/supabase/pin-auth';
+import { setPin as savePin } from '@/services/supabase/pin-auth';
 
 interface PinSetupProps {
   userId: string;
@@ -95,7 +95,7 @@ export function PinSetup({ userId, onComplete, onSkip, isRequired = false }: Pin
 
       // Save PIN
       setIsSubmitting(true);
-      const result = await setPin(userId, enteredPin);
+      const result = await savePin(userId, enteredPin);
 
       if (result.success) {
         onComplete();

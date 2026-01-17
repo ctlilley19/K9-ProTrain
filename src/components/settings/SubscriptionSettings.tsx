@@ -127,13 +127,22 @@ export function SubscriptionSettings() {
 
       if (error) throw error;
 
+      const facilityData = data as {
+        subscription_tier?: string;
+        subscription_status?: string;
+        billing_interval?: 'year' | 'month';
+        current_period_end?: string | null;
+        cancel_at_period_end?: boolean;
+        stripe_customer_id?: string | null;
+      };
+
       setSubscription({
-        tier: data.subscription_tier || 'starter',
-        status: data.subscription_status || 'active',
-        billingInterval: data.billing_interval || 'month',
-        currentPeriodEnd: data.current_period_end,
-        cancelAtPeriodEnd: data.cancel_at_period_end || false,
-        stripeCustomerId: data.stripe_customer_id,
+        tier: facilityData.subscription_tier || 'starter',
+        status: facilityData.subscription_status || 'active',
+        billingInterval: facilityData.billing_interval || 'month',
+        currentPeriodEnd: facilityData.current_period_end ?? null,
+        cancelAtPeriodEnd: facilityData.cancel_at_period_end || false,
+        stripeCustomerId: facilityData.stripe_customer_id ?? null,
       });
     } catch (err) {
       console.error('Error fetching subscription:', err);

@@ -108,7 +108,7 @@ export function SecuritySettings() {
   if (isDemoModeActive) {
     return (
       <Card>
-        <CardHeader title="Security" subtitle="Manage your account security settings" />
+        <CardHeader title="Security" description="Manage your account security settings" />
         <CardContent>
           <div className="text-center py-8 text-surface-400">
             <Shield size={48} className="mx-auto mb-4 opacity-50" />
@@ -140,7 +140,7 @@ export function SecuritySettings() {
       <Card>
         <CardHeader
           title="Quick PIN Access"
-          subtitle="Set up a PIN for faster, secure access to your account"
+          description="Set up a PIN for faster, secure access to your account"
         />
         <CardContent>
           <div className="flex items-center justify-between p-4 rounded-xl bg-surface-800/50">
@@ -195,7 +195,7 @@ export function SecuritySettings() {
       <Card>
         <CardHeader
           title="Active Sessions"
-          subtitle="Devices where you're currently signed in"
+          description="Devices where you're currently signed in"
           action={
             sessions.length > 1 ? (
               <Button

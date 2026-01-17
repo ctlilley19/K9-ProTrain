@@ -70,7 +70,7 @@ export function QuickLogScreen({ tag, user }: QuickLogScreenProps) {
       // Log the activity
       await supabase.from('activities').insert({
         dog_id: dog.id,
-        facility_id: tag.facility?.name ? undefined : undefined, // Get from tag if available
+        facility_id: undefined,
         type: activityKey,
         performed_by: user.id,
         notes: note || null,

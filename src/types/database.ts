@@ -237,7 +237,7 @@ export interface User {
 export interface Family {
   id: string;
   facility_id: string;
-  primary_contact_id: string;
+  primary_contact_id: string | null;
   name: string;
   address: string | null;
   city: string | null;
@@ -249,6 +249,7 @@ export interface Family {
   emergency_contact_phone: string | null;
   vet_name: string | null;
   vet_phone: string | null;
+  vet_address: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -722,12 +723,6 @@ export interface ActivityWithDetails extends Activity {
   trainer: User;
   buddy_dog: Dog | null;
   media: Media[];
-}
-
-export interface DailyReportWithDetails extends DailyReport {
-  dog: Dog;
-  program: Program;
-  activities: Activity[];
 }
 
 // Homework Extended Types

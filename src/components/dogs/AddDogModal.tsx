@@ -219,16 +219,15 @@ export function AddDogModal({ isOpen, onClose, onSuccess }: AddDogModalProps) {
       await createDog.mutateAsync({
         family_id: familyId,
         name: formData.name,
-        breed: formData.breed || null,
-        date_of_birth: formData.date_of_birth || null,
-        weight: formData.weight ? parseFloat(formData.weight) : null,
-        gender: formData.gender || null,
-        color: formData.color || null,
-        microchip_id: formData.microchip_id || null,
-        medical_notes: formData.medical_notes || null,
-        behavior_notes: formData.behavior_notes || null,
-        feeding_instructions: formData.feeding_instructions || null,
-        medications: formData.medications || null,
+        breed: formData.breed || undefined,
+        date_of_birth: formData.date_of_birth || undefined,
+        weight: formData.weight ? parseFloat(formData.weight) : undefined,
+        gender: (formData.gender as 'male' | 'female') || undefined,
+        color: formData.color || undefined,
+        medical_notes: formData.medical_notes || undefined,
+        behavior_notes: formData.behavior_notes || undefined,
+        feeding_instructions: formData.feeding_instructions || undefined,
+        medications: formData.medications || undefined,
       });
       handleClose();
       onSuccess?.();

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 
 
 // GET /api/tags/orders - List orders for a facility
@@ -228,7 +228,7 @@ export async function POST(request: NextRequest) {
     let customerId = facility.stripe_customer_id;
 
     if (!customerId) {
-      const customer = await stripe.customers.create({
+      const customer = await getStripe().customers.create({
         metadata: { facility_id: facilityId },
       });
       customerId = customer.id;
@@ -239,7 +239,7 @@ export async function POST(request: NextRequest) {
         .eq('id', facilityId);
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       customer: customerId,
       mode: 'payment',
       payment_method_types: ['card'],

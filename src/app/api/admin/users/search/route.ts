@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
         last_login: user.last_login_at,
         is_suspended: false, // Would need a suspended field in users table
         dogs_count: dogsResult.count || 0,
-        subscription_tier: facilityResult.data?.facility?.subscription_tier || 'Free',
+        subscription_tier: (facilityResult.data?.facility as { subscription_tier?: string } | null)?.subscription_tier || 'Free',
       };
     }));
 
@@ -176,8 +176,8 @@ export async function GET(request: NextRequest) {
       last_login: user.last_login_at,
       is_suspended: false,
       dogs_count: dogsCount || 0,
-      subscription_tier: facilityMember?.facility?.subscription_tier || 'Free',
-      subscription_status: facilityMember?.facility?.subscription_status,
+      subscription_tier: (facilityMember?.facility as { subscription_tier?: string; subscription_status?: string } | null)?.subscription_tier || 'Free',
+      subscription_status: (facilityMember?.facility as { subscription_tier?: string; subscription_status?: string } | null)?.subscription_status,
     };
 
     return NextResponse.json({ user: userData });

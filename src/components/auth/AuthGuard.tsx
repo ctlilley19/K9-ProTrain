@@ -135,7 +135,7 @@ export function AuthGuard({ children, requirePin = false }: AuthGuardProps) {
       <PinEntry
         userId={user.id}
         userName={user.name}
-        userAvatar={user.avatar_url}
+        userAvatar={user.avatar_url ?? undefined}
         onSuccess={handlePinSuccess}
         onRequireFullAuth={handleRequireFullAuth}
       />

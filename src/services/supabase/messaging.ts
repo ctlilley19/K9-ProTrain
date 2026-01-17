@@ -44,6 +44,7 @@ const mockConversations: ConversationWithDetails[] = [
       emergency_contact_phone: '(555) 123-4568',
       vet_name: 'Happy Paws Vet',
       vet_phone: '(555) 987-6543',
+      vet_address: null,
       notes: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -98,6 +99,7 @@ const mockConversations: ConversationWithDetails[] = [
       emergency_contact_phone: null,
       vet_name: null,
       vet_phone: null,
+      vet_address: null,
       notes: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -152,6 +154,7 @@ const mockConversations: ConversationWithDetails[] = [
       emergency_contact_phone: null,
       vet_name: null,
       vet_phone: null,
+      vet_address: null,
       notes: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -362,7 +365,7 @@ export const conversationsService = {
     isPinned?: boolean;
     search?: string;
   }): Promise<ConversationWithDetails[]> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       let filtered = [...demoConversations];
       if (options?.isArchived !== undefined) {
         filtered = filtered.filter((c) => c.is_archived === options.isArchived);
@@ -408,7 +411,7 @@ export const conversationsService = {
 
   // Get conversations for pet parent (family view)
   async getForFamily(familyId: string): Promise<ConversationWithDetails[]> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       return demoConversations
         .filter((c) => c.family_id === familyId && !c.is_archived)
         .sort(
@@ -434,7 +437,7 @@ export const conversationsService = {
 
   // Get single conversation with messages
   async getById(id: string): Promise<ConversationWithDetails | null> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const conv = demoConversations.find((c) => c.id === id);
       if (!conv) return null;
       const messages = demoMessages.filter((m) => m.conversation_id === id);
@@ -462,7 +465,7 @@ export const conversationsService = {
     dog_id?: string;
     title?: string;
   }): Promise<Conversation> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const newConv: ConversationWithDetails = {
         id: `conv-${Date.now()}`,
         facility_id: data.facility_id,
@@ -500,7 +503,7 @@ export const conversationsService = {
     id: string,
     data: Partial<Pick<Conversation, 'is_archived' | 'is_pinned' | 'title'>>
   ): Promise<Conversation> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const index = demoConversations.findIndex((c) => c.id === id);
       if (index !== -1) {
         demoConversations[index] = {
@@ -526,7 +529,7 @@ export const conversationsService = {
 
   // Get unread counts for trainer dashboard
   async getUnreadCount(): Promise<number> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       return demoConversations.reduce((sum, c) => sum + c.trainer_unread_count, 0);
     }
 
@@ -541,7 +544,7 @@ export const conversationsService = {
 
   // Get unread counts for pet parent
   async getUnreadCountForFamily(familyId: string): Promise<number> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       return demoConversations
         .filter((c) => c.family_id === familyId)
         .reduce((sum, c) => sum + c.parent_unread_count, 0);
@@ -568,7 +571,7 @@ export const messagesService = {
     conversationId: string,
     options?: { limit?: number; offset?: number }
   ): Promise<MessageWithSender[]> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       let messages = demoMessages
         .filter((m) => m.conversation_id === conversationId && !m.is_deleted)
         .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
@@ -616,7 +619,7 @@ export const messagesService = {
     media_url?: string;
     reply_to_id?: string;
   }): Promise<Message> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const newMessage: MessageWithSender = {
         id: `msg-${Date.now()}`,
         conversation_id: data.conversation_id,
@@ -701,7 +704,7 @@ export const messagesService = {
     conversationId: string,
     readerType: 'trainer' | 'parent'
   ): Promise<void> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       demoMessages = demoMessages.map((m) => {
         if (m.conversation_id === conversationId) {
           return {
@@ -739,7 +742,7 @@ export const messagesService = {
 
   // Edit a message
   async edit(id: string, content: string): Promise<Message> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const index = demoMessages.findIndex((m) => m.id === id);
       if (index !== -1) {
         demoMessages[index] = {
@@ -770,7 +773,7 @@ export const messagesService = {
 
   // Delete a message (soft delete)
   async delete(id: string): Promise<void> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const index = demoMessages.findIndex((m) => m.id === id);
       if (index !== -1) {
         demoMessages[index] = {
@@ -795,7 +798,7 @@ export const messagesService = {
 
   // Add reaction to message
   async addReaction(messageId: string, userId: string, reaction: string): Promise<void> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const msgIndex = demoMessages.findIndex((m) => m.id === messageId);
       if (msgIndex !== -1) {
         const existingReaction = demoMessages[msgIndex].reactions.find(
@@ -825,7 +828,7 @@ export const messagesService = {
 
   // Remove reaction from message
   async removeReaction(messageId: string, userId: string, reaction: string): Promise<void> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const msgIndex = demoMessages.findIndex((m) => m.id === messageId);
       if (msgIndex !== -1) {
         demoMessages[msgIndex].reactions = demoMessages[msgIndex].reactions.filter(
@@ -852,7 +855,7 @@ export const messagesService = {
 
 export const messageTemplatesService = {
   async getAll(options?: { category?: string; isActive?: boolean }): Promise<MessageTemplate[]> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       let templates = [...mockMessageTemplates];
       if (options?.category) {
         templates = templates.filter((t) => t.category === options.category);
@@ -884,7 +887,7 @@ export const messageTemplatesService = {
     category?: string;
     created_by?: string;
   }): Promise<MessageTemplate> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const newTemplate: MessageTemplate = {
         id: `template-${Date.now()}`,
         facility_id: data.facility_id,
@@ -915,7 +918,7 @@ export const messageTemplatesService = {
     id: string,
     data: Partial<Pick<MessageTemplate, 'title' | 'content' | 'category' | 'is_active'>>
   ): Promise<MessageTemplate> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const index = mockMessageTemplates.findIndex((t) => t.id === id);
       if (index !== -1) {
         mockMessageTemplates[index] = {
@@ -940,7 +943,7 @@ export const messageTemplatesService = {
   },
 
   async delete(id: string): Promise<void> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const index = mockMessageTemplates.findIndex((t) => t.id === id);
       if (index !== -1) {
         mockMessageTemplates.splice(index, 1);
@@ -953,7 +956,7 @@ export const messageTemplatesService = {
   },
 
   async incrementUsage(id: string): Promise<void> {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       const index = mockMessageTemplates.findIndex((t) => t.id === id);
       if (index !== -1) {
         mockMessageTemplates[index].usage_count++;

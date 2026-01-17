@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#1d4ed8"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- K9 Text -->
+  <text x="256" y="200" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="140" font-weight="bold">K9</text>
+  <!-- Dog silhouette/paw -->
+  <g transform="translate(156, 240)" fill="white" opacity="0.95">
+    <ellipse cx="100" cy="60" rx="70" ry="50"/>
+    <!-- Paw pads -->
+    <circle cx="50" cy="130" r="28"/>
+    <circle cx="100" cy="145" r="32"/>
+    <circle cx="150" cy="130" r="28"/>
+    <ellipse cx="100" cy="195" rx="50" ry="38"/>
+  </g>
+</svg>
