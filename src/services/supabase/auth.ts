@@ -73,44 +73,20 @@ export const authService = {
     if (!authData.user) throw new Error('No user returned from sign up');
 
     try {
-      // Create facility
-      const { data: facility, error: facilityError } = await supabase
-        .from('facilities')
-        .insert({
-          name: facilityName,
-          email,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          subscription_tier: 'free',
-          settings: {
-            kennel_max_minutes: 240,
-            potty_interval_minutes: 120,
-            daily_report_time: '18:00',
-            enable_realtime_updates: true,
-            enable_photo_sharing: true,
-          },
-        })
-        .select()
-        .single();
+      // Use the secure signup function to create facility and user profile
+      // This bypasses RLS using SECURITY DEFINER
+      const { data, error } = await supabase.rpc('handle_new_user_signup', {
+        p_auth_id: authData.user.id,
+        p_email: email,
+        p_name: name,
+        p_facility_name: facilityName,
+      });
 
-      if (facilityError) throw facilityError;
+      if (error) throw error;
+      if (!data) throw new Error('No data returned from signup');
 
-      // Create user profile
-      const { data: user, error: userError } = await supabase
-        .from('users')
-        .insert({
-          auth_id: authData.user.id,
-          facility_id: facility.id,
-          email,
-          name,
-          role: 'owner',
-          is_active: true,
-        })
-        .select()
-        .single();
-
-      if (userError) throw userError;
-
-      return { user, facility };
+      const result = data as { user: User; facility: Facility };
+      return { user: result.user, facility: result.facility };
     } catch (error) {
       // Cleanup: delete auth user if profile creation fails
       await supabase.auth.admin.deleteUser(authData.user.id).catch(() => {
